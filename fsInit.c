@@ -23,7 +23,7 @@
 #include "fsLow.h"
 #include "mfs.h"
 #define initDirAmt 52
-#define magicNumber 734743912 // random signature
+#define magicNumber 734743916 // random signature
 
 typedef struct directoryEntry
 {
@@ -64,7 +64,7 @@ int initRootDir(int blockSize)
 	strncpy(directory[1].fileName, "..", 2);
 	LBAwrite(directory, 14, 6); // LBA write 14 blocks starting at 6
 
-	return 6; //return start location
+	return 6; // return start location
 }
 
 int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
