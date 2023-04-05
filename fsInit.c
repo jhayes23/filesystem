@@ -40,22 +40,38 @@ typedef struct directoryEntry
 } directoryEntry;
 typedef struct VCB
 {
-	int signature;		// signature to know if filesystem has been initialized
-	int blockSize;		// size of each block
-	int totalBlocks;	// total blocks available
-	int freeBlocks;		// number of free blocks
-	int freeSpaceBlock; // starting block for free space manager
-	int rootDirBlock;	// starting block for root directory
+	int signature;			   // signature to know if filesystem has been initialized
+	int blockSize;			   // size of each block
+	int totalBlocks;		   // total blocks available
+	int freeBlocks;			   // number of free blocks
+	int freeSpaceManagerBlock; // starting block for free space manager
+	int rootDirBlock;		   // starting block for root directory
 } VCB;
+
+int freeSpaceManagerInit(int totalBlocks, int blockSize)
+{
+	int freeSpaceManagerBlocks = totalBlocks / (8 * blockSize) + 1;
+	int *freeSpaceMap = malloc(freeSpaceManagerBlocks * blockSize);
+	for (int i = 0; i <= freeSpaceManagerBlocks; i++)
+	{
+		freeSpaceMap[i] = 1;
+	}
+	for (int j = freeSpaceManagerBlocks + 1; j < freeSpaceManagerBlocks * blockSize; j++)
+	{
+		freeSpaceMap[j] = 0;
+	}
+	LBAwrite(freeSpaceMap, freeSpaceManagerBlocks, 1);
+	return freeSpaceManagerBlocks + 1;
+}
 
 int initRootDir(int blockSize)
 {
 	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
 	struct directoryEntry *directory = malloc(initDirAmt * sizeof(directoryEntry));
-	for (int i = 0; i < initDirAmt; i++)
-	{
-		// mark entry as free
-	}
+	// for (int i = 0; i < initDirAmt; i++)
+	// {
+	// 	// mark entry as free
+	// }
 
 	// Todo: Ask free space for 14 blocks:
 	// free space returns start location of the 14 blocks (i.e: 6)
