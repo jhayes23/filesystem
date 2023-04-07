@@ -20,7 +20,6 @@
 *	a logical block array (a series of blocks - nominally 512 bytes,
 *	that the logical layer can utilize). 
 *
-*	It is imperative that the logical layer (your layer) first
 *	call startPartitionSystem before using any function and when
 *	finished calls closePartitionSystem() to ensure that the 
 *	file that represents the physical drive is properally closed.
