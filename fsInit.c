@@ -27,7 +27,7 @@
 #define initDirAmt 52
 #define magicNumber 734743917 // random signature
 
-int freeSpaceManagerInit(int totalBlocks, int blockSize)
+int initFreeSpaceManager(int totalBlocks, int blockSize)
 {
 	int freeSpaceManagerBlocks = totalBlocks / (8 * blockSize) + 1;
 	int *freeSpaceMap = malloc(freeSpaceManagerBlocks * blockSize);
@@ -54,7 +54,10 @@ int initRootDir(int blockSize)
 
 	// Todo: Ask free space for 14 blocks:
 	// free space returns start location of the 14 blocks (i.e: 6)
-
+	char *VCBBuffer;
+	LBAread(VCBBuffer, 1, 0);
+	printf("VCB Buffer: %s\n", *VCBBuffer);
+	// printf("VCB->freeSpaceManagerBlock: %d\n", LBAread())
 	strncpy(directory[0].fileName, ".", 1);
 	strncpy(directory[1].fileName, "..", 2);
 	LBAwrite(directory, 14, 6); // LBA write 14 blocks starting at 6
@@ -79,8 +82,8 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 
 			// Set vals returned from init procedures
 
-			// vcb->freeSpaceBlock = initFreeSpace(numberOfBlocks, blockSize);
-			VCB->rootDirBlock = initRootDir(blockSize);
+			// VCB->freeSpaceManagerBlock = initFreeSpaceManager(VCB->totalBlocks, VCB->blockSize);
+			VCB->rootDirBlock = initRootDir(VCB->blockSize);
 
 			LBAwrite(VCB, 1, 0); // LBAwrite VCB back to disk
 		}
