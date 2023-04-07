@@ -22,31 +22,10 @@
 
 #include "fsLow.h"
 #include "mfs.h"
+#include "vcb.h"
+#include "directoryEntry.h"
 #define initDirAmt 52
-#define magicNumber 734743916 // random signature
-
-typedef struct directoryEntry
-{
-	// size of struct is 136 bytes
-	int id;
-	int isFile;
-	int location;
-	int fileSize;
-	time_t createDate;
-	time_t lastAccessDate;
-	time_t lastModifyDate;
-	char fileName[64];
-	char author[32];
-} directoryEntry;
-typedef struct VCB
-{
-	int signature;			   // signature to know if filesystem has been initialized
-	int blockSize;			   // size of each block
-	int totalBlocks;		   // total blocks available
-	int freeBlocks;			   // number of free blocks
-	int freeSpaceManagerBlock; // starting block for free space manager
-	int rootDirBlock;		   // starting block for root directory
-} VCB;
+#define magicNumber 734743917 // random signature
 
 int freeSpaceManagerInit(int totalBlocks, int blockSize)
 {

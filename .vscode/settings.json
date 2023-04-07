@@ -1,8 +1,6 @@
 {
     "files.associations": {
-        "stdio.h": "c",
-        "string.h": "c",
-        "fslow.h": "c",
-        "types.h": "c"
+        "stdlib.h": "c",
+        "unistd.h": "c"
     }
 }
