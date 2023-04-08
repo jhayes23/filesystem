@@ -29,16 +29,15 @@
 int initFreeSpaceManager(int totalBlocks, int blockSize)
 {
 	int freeSpaceManagerBlocks = totalBlocks / (8 * blockSize) + 1;
-	int *freeSpaceManager = malloc(freeSpaceManagerBlocks * blockSize);
-	printf("totalBlocks / blockSize: %d\n", freeSpaceManagerBlocks * blockSize);
-	for (int i = 0; i <= freeSpaceManagerBlocks; i++)
+	int *freeSpaceManager = malloc((freeSpaceManagerBlocks * blockSize) * sizeof(int));
+	for (int i = 0; i < freeSpaceManagerBlocks; i++)
 	{
 		freeSpaceManager[i] = 1;
 	}
-	// for (int j = freeSpaceManagerBlocks + 1; j < freeSpaceManagerBlocks * blockSize; j++)
-	// {
-	// 	freeSpaceManager[j] = 0;
-	// }
+	for (int j = freeSpaceManagerBlocks; j <= freeSpaceManagerBlocks * blockSize; j++)
+	{
+		freeSpaceManager[j] = 0;
+	}
 	LBAwrite(freeSpaceManager, freeSpaceManagerBlocks, 1);
 	return freeSpaceManagerBlocks + 1;
 }
