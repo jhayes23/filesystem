@@ -52,7 +52,7 @@ int findFreeBlocks(int requestedBlocks)
 	VCB * vcb = malloc(512);
 	int * freeSpaceManager = malloc(5 * 512 * sizeof(int));
 
-	LBAread(freeSpaceManager,5,vcb -> freeSpaceManagerBlock);
+	LBAread(freeSpaceManager,5,1);
 
 	for(int i = 0; i < vcb -> totalBlocks; i++) 
 	{
@@ -93,11 +93,17 @@ int initRootDir(int blockSize)
 	// Todo: Ask free space for 14 blocks:
 	// free space returns start location of the 14 blocks (i.e: 6)
 
+	// ask for 14 blocks here
+	int firstFreeBlock = findFreeBlocks(14);
+
+	// printf("FIRST FREE BLOCK %d \n", firstFreeBlock);
+
+
 	strncpy(directory[0].fileName, ".", 1);
 	strncpy(directory[1].fileName, "..", 2);
 	LBAwrite(directory, 14, 6); // LBA write 14 blocks starting at 6
 
-	return 6; // return start location
+	return firstFreeBlock; // return start location
 }
 
 int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
@@ -126,6 +132,7 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 		{
 			// loadFreeSpace into memory
 			printf("VCB ALREADY INITALIZED;\nSignature: %d\n", VCB->signature);
+			printf("START OF FREE BLOCK %d\n", VCB->rootDirBlock);
 		}
 	}
 	return 0;
