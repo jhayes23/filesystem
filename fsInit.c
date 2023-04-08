@@ -26,6 +26,8 @@
 #include "directoryEntry.h"
 #define initDirAmt 52
 #define magicNumber 734743917 // random signature
+
+
 int initFreeSpaceManager(int totalBlocks, int blockSize)
 {
 	int freeSpaceManagerBlocks = totalBlocks / (8 * blockSize) + 1;
@@ -40,6 +42,43 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
 	}
 	LBAwrite(freeSpaceManager, freeSpaceManagerBlocks, 1);
 	return freeSpaceManagerBlocks + 1;
+}
+
+int findFreeBlocks(VCB * vcb, int requestedBlocks)
+{
+	int freeBlockCount = 0;
+	int startIndex = -1;
+	
+	int * freeSpaceManager = malloc(5 * 512 * sizeof(int));
+
+	LBAread(freeSpaceManager,5,vcb -> freeSpaceManagerBlock);
+
+	for(int i = 0; i < vcb -> totalBlocks; i++) 
+	{
+		if(freeSpaceManager[i] == 0)
+		{
+			 freeBlockCount += 1;
+			 startIndex = i;
+			 
+			 for(int j = i + 1; i < requestedBlocks -1; j++) 
+			 {
+				if(freeSpaceManager[j] == 1) 
+				{
+					// reset
+					startIndex = -1;
+					freeBlockCount = 0;
+					break;
+				}
+				freeBlockCount++;
+			 }
+
+			 if(freeBlockCount == requestedBlocks)
+			 {
+				return startIndex;
+			 }
+		}
+	}
+	return -1;
 }
 
 int initRootDir(int blockSize)
