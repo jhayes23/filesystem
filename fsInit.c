@@ -44,11 +44,12 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
 	return freeSpaceManagerBlocks + 1;
 }
 
-int findFreeBlocks(VCB * vcb, int requestedBlocks)
+int findFreeBlocks(int requestedBlocks)
 {
 	int freeBlockCount = 0;
 	int startIndex = -1;
 	
+	VCB * vcb = malloc(512);
 	int * freeSpaceManager = malloc(5 * 512 * sizeof(int));
 
 	LBAread(freeSpaceManager,5,vcb -> freeSpaceManagerBlock);
@@ -71,7 +72,6 @@ int findFreeBlocks(VCB * vcb, int requestedBlocks)
 				}
 				freeBlockCount++;
 			 }
-
 			 if(freeBlockCount == requestedBlocks)
 			 {
 				return startIndex;
