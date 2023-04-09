@@ -1,3 +1,19 @@
+/**************************************************************
+ * Class:  CSC-415-01 Spring 2023
+ * Names: Anthony Benjamin, Nyan Ye Lin, David Chen, Joshua Hayes
+ * Student IDs: 921119898, 921572181, 922379312
+ * GitHub Name: copbrick
+ * Group Name: Team DALJ
+ * Project: Basic File System
+ *
+ * File: vcb.h
+ *
+ * Description: Header file that stores our VCB struct, which includes our magic number.
+ *
+ * 
+ *
+ **************************************************************/
+
 typedef struct VCB
 {
     int signature;             // signature to know if filesystem has been initialized
