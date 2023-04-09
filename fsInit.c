@@ -27,6 +27,13 @@
 #define initDirAmt 52
 #define magicNumber 734743917 // random signature
 
+/**
+ * initFreeSpaceManager initalizes our bitmap array. We reserve space
+ * in memory for the manager, then we fill the first blocks that the manager takes up
+ * as occupied (1). We then fill up the rest of our bitmap array with 0's to indicate free blocks.
+ * 
+ * We then write to the disk and return the starting position of the freeSpaceManager
+*/
 int initFreeSpaceManager(int totalBlocks, int blockSize)
 {
 	int freeSpaceManagerBlocks = totalBlocks / (8 * blockSize) + 1;
@@ -40,9 +47,13 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
 		freeSpaceManager[j] = 0;
 	}
 	LBAwrite(freeSpaceManager, freeSpaceManagerBlocks, 1);
-	return freeSpaceManagerBlocks + 1;
+	return 1;
 }
-
+/**
+ * This function allows the file system to request N amount of blocks,
+ * then we check the first group of blocks that are 0 and equals requestedBlocks.
+ * Once we find this group, we return the starting index of the blocks.
+*/
 int findFreeBlocks(int requestedBlocks)
 {
 	int freeBlockCount = 0;
