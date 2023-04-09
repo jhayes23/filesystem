@@ -87,28 +87,6 @@ int findFreeBlocks(int requestedBlocks)
 		{
 			return i;
 		}
-		// if (freeSpaceManager[i] == 0)
-		// {
-		// 	freeBlockCount += 1;
-		// 	startIndex = i;
-
-		// 	for (int j = i + 1; j < requestedBlocks - 1; j++)
-		// 	{
-
-		// 		if (freeSpaceManager[j] == 1)
-		// 		{
-		// 			// reset
-		// 			startIndex = -1;
-		// 			freeBlockCount = 0;
-		// 			break;
-		// 		}
-		// 		freeBlockCount++;
-		// 	}
-		// 	if (freeBlockCount == requestedBlocks)
-		// 	{
-		// 		return startIndex;
-		// 	}
-		// }
 	}
 	return -1;
 }
