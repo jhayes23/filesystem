@@ -27,7 +27,6 @@
 #define initDirAmt 52
 #define magicNumber 734743917 // random signature
 
-
 int initFreeSpaceManager(int totalBlocks, int blockSize)
 {
 	int freeSpaceManagerBlocks = totalBlocks / (8 * blockSize) + 1;
@@ -48,22 +47,24 @@ int findFreeBlocks(int requestedBlocks)
 {
 	int freeBlockCount = 0;
 	int startIndex = -1;
-	
-	VCB * vcb = malloc(512);
-	int * freeSpaceManager = malloc(5 * 512 * sizeof(int));
 
-	LBAread(freeSpaceManager,5,1);
+	VCB *vcb = malloc(512);
+	LBAread(vcb, 1, 0);
+	int *freeSpaceManager = malloc(5 * 512 * sizeof(int));
 
-	for(int i = 0; i < vcb -> totalBlocks; i++) 
+	LBAread(freeSpaceManager, 5, 1);
+
+	printf("VCB->totalBlocks: %d\n", vcb->totalBlocks);
+	for (int i = 0; i < vcb->totalBlocks; i++)
 	{
-		if(freeSpaceManager[i] == 0)
+		if (freeSpaceManager[i] == 0)
 		{
-			 freeBlockCount += 1;
-			 startIndex = i;
-			 
-			 for(int j = i + 1; i < requestedBlocks -1; j++) 
-			 {
-				if(freeSpaceManager[j] == 1) 
+			freeBlockCount += 1;
+			startIndex = i;
+
+			for (int j = i + 1; i < requestedBlocks - 1; j++)
+			{
+				if (freeSpaceManager[j] == 1)
 				{
 					// reset
 					startIndex = -1;
@@ -71,11 +72,11 @@ int findFreeBlocks(int requestedBlocks)
 					break;
 				}
 				freeBlockCount++;
-			 }
-			 if(freeBlockCount == requestedBlocks)
-			 {
+			}
+			if (freeBlockCount == requestedBlocks)
+			{
 				return startIndex;
-			 }
+			}
 		}
 	}
 	return -1;
@@ -97,7 +98,6 @@ int initRootDir(int blockSize)
 	int firstFreeBlock = findFreeBlocks(14);
 
 	// printf("FIRST FREE BLOCK %d \n", firstFreeBlock);
-
 
 	strncpy(directory[0].fileName, ".", 1);
 	strncpy(directory[1].fileName, "..", 2);
@@ -134,7 +134,6 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 			printf("VCB ALREADY INITALIZED;\nSignature: %d\n", VCB->signature);
 			printf("START OF FREE BLOCK %d\n", VCB->rootDirBlock);
 			printf("VCB POINTER : %p\n", VCB);
-
 		}
 	}
 	return 0;
