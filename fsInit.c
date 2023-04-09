@@ -52,18 +52,22 @@ int findFreeBlocks(int requestedBlocks)
 	LBAread(vcb, 1, 0);
 	int *freeSpaceManager = malloc(5 * 512 * sizeof(int));
 
+	int freeSpaceManagerSize = 5 * 512 * sizeof(int);
+
 	LBAread(freeSpaceManager, 5, 1);
 
 	printf("VCB->totalBlocks: %d\n", vcb->totalBlocks);
-	for (int i = 0; i < vcb->totalBlocks; i++)
+	
+	for (int i = 0; i < freeSpaceManagerSize - requestedBlocks; i++)
 	{
 		if (freeSpaceManager[i] == 0)
 		{
 			freeBlockCount += 1;
 			startIndex = i;
 
-			for (int j = i + 1; i < requestedBlocks - 1; j++)
+			for (int j = i + 1; j < requestedBlocks - 1; j++)
 			{
+
 				if (freeSpaceManager[j] == 1)
 				{
 					// reset
@@ -78,6 +82,7 @@ int findFreeBlocks(int requestedBlocks)
 				return startIndex;
 			}
 		}
+
 	}
 	return -1;
 }
