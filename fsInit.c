@@ -19,19 +19,20 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "fsLow.h"
 #include "mfs.h"
 #include "vcb.h"
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
 #define initDirAmt 52
-#define magicNumber 734743916 // random signature
+#define magicNumber 734743927 // random signature
 
 int initRootDir(int blockSize)
 {
 	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
 	struct directoryEntry *directory = malloc(initDirAmt * sizeof(directoryEntry));
+	int blocksNeeded = initDirAmt * sizeof(directoryEntry) / blockSize + 1;
+	printf("blockNeeded: %d\n", blocksNeeded);
 	// for (int i = 0; i < initDirAmt; i++)
 	// {
 	// 	// mark entry as free
@@ -43,13 +44,12 @@ int initRootDir(int blockSize)
 	// ask for 14 blocks here
 	int firstFreeBlock = findFreeBlocks(14);
 
-	// printf("FIRST FREE BLOCK %d \n", firstFreeBlock);
+	printf("FIRST FREE BLOCK %d \n", firstFreeBlock);
 
 	strncpy(directory[0].fileName, ".", 1);
 	strncpy(directory[1].fileName, "..", 2);
 	printf("directory[0].fileName: %s", directory[0].fileName);
-	LBAwrite(directory, 14, 6); // LBA write 14 blocks starting at 6
-
+	LBAwrite(directory, blocksNeeded, firstFreeBlock); // LBA write blocksNeeded blocks starting at firstFreeBlock
 	return firstFreeBlock; // return start location
 }
 
