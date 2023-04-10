@@ -24,72 +24,9 @@
 #include "mfs.h"
 #include "vcb.h"
 #include "directoryEntry.h"
+#include "freeSpaceManager.h"
 #define initDirAmt 52
 #define magicNumber 734743916 // random signature
-
-/**
- * initFreeSpaceManager initalizes our bitmap array. We reserve space
- * in memory for the manager, then we fill the first blocks that the manager takes up
- * as occupied (1). We then fill up the rest of our bitmap array with 0's to indicate free blocks.
- *
- * We then write to the disk and return the starting position of the freeSpaceManager
- */
-int initFreeSpaceManager(int totalBlocks, int blockSize)
-{
-	int freeSpaceManagerBlocks = totalBlocks / (8 * blockSize) + 1;
-	int *freeSpaceManager = malloc((freeSpaceManagerBlocks * blockSize) * sizeof(int));
-	for (int i = 0; i < freeSpaceManagerBlocks; i++)
-	{
-		freeSpaceManager[i] = 1;
-	}
-	for (int j = freeSpaceManagerBlocks; j <= freeSpaceManagerBlocks * blockSize; j++)
-	{
-		freeSpaceManager[j] = 0;
-	}
-	LBAwrite(freeSpaceManager, freeSpaceManagerBlocks, 1);
-	return 1;
-}
-/**
- * This function allows the file system to request N amount of blocks,
- * then we check the first group of blocks that are 0 and equals requestedBlocks.
- * Once we find this group, we return the starting index of the blocks.
- */
-int findFreeBlocks(int requestedBlocks)
-{
-	// int freeBlockCount = 0;
-	// int startIndex = -1;
-
-	VCB *vcb = malloc(512);
-	LBAread(vcb, 1, 0);
-	int *freeSpaceManager = malloc(5 * 512 * sizeof(int));
-
-	int freeSpaceManagerSize = 5 * 512 * sizeof(int);
-
-	LBAread(freeSpaceManager, 5, 1);
-
-	printf("VCB->totalBlocks: %d\n", vcb->totalBlocks);
-
-	for (int i = 0; i < freeSpaceManagerSize - requestedBlocks + 1; i++)
-	{
-		int freeBlockCount = 0;
-		for (int j = 0; j < requestedBlocks; j++)
-		{
-			if (freeSpaceManager[i + j] == 0)
-			{
-				freeBlockCount++;
-			}
-			else
-			{
-				break;
-			}
-		}
-		if (freeBlockCount == requestedBlocks)
-		{
-			return i;
-		}
-	}
-	return -1;
-}
 
 int initRootDir(int blockSize)
 {
@@ -110,6 +47,7 @@ int initRootDir(int blockSize)
 
 	strncpy(directory[0].fileName, ".", 1);
 	strncpy(directory[1].fileName, "..", 2);
+	printf("directory[0].fileName: %s", directory[0].fileName);
 	LBAwrite(directory, 14, 6); // LBA write 14 blocks starting at 6
 
 	return firstFreeBlock; // return start location
