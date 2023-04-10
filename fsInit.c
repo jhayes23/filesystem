@@ -79,8 +79,6 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 		{
 			// loadFreeSpace into memory
 			printf("VCB ALREADY INITALIZED;\nSignature: %d\n", VCB->signature);
-			printf("START OF FREE BLOCK %d\n", VCB->rootDirBlock);
-			printf("VCB POINTER : %p\n", VCB);
 		}
 	}
 	return 0;
