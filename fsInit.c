@@ -25,7 +25,7 @@
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
 #define initDirAmt 52
-#define magicNumber 734743926 // random signature
+#define magicNumber 734743927 // random signature
 
 int initRootDir(int blockSize)
 {
