@@ -55,26 +55,39 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 	struct VCB *VCB = malloc(blockSize);
 	if (LBAread(VCB, 1, 0) == 1) // Read block 0 from disk into VCB
 	{
-		if (VCB->signature != magicNumber) // System not initalized
-		{
-			// init vcb since signature is missing or does not match
-			VCB->signature = magicNumber;
-			VCB->blockSize = blockSize;
-			VCB->totalBlocks = numberOfBlocks;
-			VCB->freeBlocks = numberOfBlocks;
+		// init vcb since signature is missing or does not match
+		VCB->signature = magicNumber;
+		VCB->blockSize = blockSize;
+		VCB->totalBlocks = numberOfBlocks;
+		VCB->freeBlocks = numberOfBlocks;
 
-			// Set vals returned from init procedures
+		// Set vals returned from init procedures
 
-			VCB->freeSpaceManagerBlock = initFreeSpaceManager(VCB->totalBlocks, VCB->blockSize);
-			VCB->rootDirBlock = initRootDir(VCB->blockSize);
+		VCB->freeSpaceManagerBlock = initFreeSpaceManager(VCB->totalBlocks, VCB->blockSize);
+		VCB->rootDirBlock = initRootDir(VCB->blockSize);
+		
+		// LBAwrite VCB back to disk
+		LBAwrite(VCB, 1, 0);
+		// if (VCB->signature != magicNumber) // System not initalized
+		// {
+		// 	// init vcb since signature is missing or does not match
+		// 	VCB->signature = magicNumber;
+		// 	VCB->blockSize = blockSize;
+		// 	VCB->totalBlocks = numberOfBlocks;
+		// 	VCB->freeBlocks = numberOfBlocks;
 
-			LBAwrite(VCB, 1, 0); // LBAwrite VCB back to disk
-		}
-		else
-		{
-			// loadFreeSpace into memory
-			printf("VCB ALREADY INITALIZED;\nSignature: %d\n", VCB->signature);
-		}
+		// 	// Set vals returned from init procedures
+
+		// 	VCB->freeSpaceManagerBlock = initFreeSpaceManager(VCB->totalBlocks, VCB->blockSize);
+		// 	VCB->rootDirBlock = initRootDir(VCB->blockSize);
+
+		// 	LBAwrite(VCB, 1, 0); // LBAwrite VCB back to disk
+		// }
+		// else
+		// {
+		// 	// loadFreeSpace into memory
+		// 	printf("VCB ALREADY INITALIZED;\nSignature: %d\n", VCB->signature);
+		// }
 	}
 	return 0;
 }
