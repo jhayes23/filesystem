@@ -25,7 +25,7 @@
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
 #define initDirAmt 52
-#define magicNumber 734743927 // random signature
+#define magicNumber 734743926 // random signature
 
 int initRootDir(int blockSize)
 {
@@ -65,7 +65,7 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 
 		VCB->freeSpaceManagerBlock = initFreeSpaceManager(VCB->totalBlocks, VCB->blockSize);
 		VCB->rootDirBlock = initRootDir(VCB->blockSize);
-		
+
 		// LBAwrite VCB back to disk
 		LBAwrite(VCB, 1, 0);
 		// if (VCB->signature != magicNumber) // System not initalized

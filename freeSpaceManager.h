@@ -31,12 +31,12 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
  */
 int findFreeBlocks(int requestedBlocks)
 {
-    VCB *vcb = malloc(512);
+    VCB *vcb = malloc(vcb->blockSize);
     LBAread(vcb, 1, 0);
+    printf("VCB->signature: %d\n", vcb->signature);
+    int *freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(int));
 
-    int *freeSpaceManager = malloc(5 * 512 * sizeof(int));
-
-    int freeSpaceManagerSize = 5 * 512 * sizeof(int);
+    int freeSpaceManagerSize = 5 * vcb->blockSize * sizeof(int);
     LBAread(freeSpaceManager, 5, 1);
 
     for (int i = 0; i < freeSpaceManagerSize - requestedBlocks + 1; i++)
