@@ -32,15 +32,7 @@ int initRootDir(int blockSize)
 	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
 	struct directoryEntry *directory = malloc(initDirAmt * sizeof(directoryEntry));
 	int blocksNeeded = initDirAmt * sizeof(directoryEntry) / blockSize + 1;
-	// for (int i = 0; i < initDirAmt; i++)
-	// {
-	// 	// mark entry as free
-	// }
-
-	// Todo: Ask free space for 14 blocks:
-	// free space returns start location of the 14 blocks (i.e: 6)
-
-	// ask for 14 blocks here
+	// ask for blocksNeeded here
 	int firstFreeBlock = findFreeBlocks(blocksNeeded);
 	strncpy(directory[0].fileName, ".", 1);
 	strncpy(directory[1].fileName, "..", 2);
