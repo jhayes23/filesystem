@@ -17,7 +17,7 @@
 char patharray[52][256];
 void parsePath(char*path){
     char pathname[256];
-    strcpy(path,pathname);
+    strcpy(pathname,path);
     char* token;
     char* rest;
     int i=0;
@@ -27,4 +27,18 @@ void parsePath(char*path){
         i++;
         token = strtok_r(NULL,"/",&rest);
     }
+    
+}
+
+int main() {
+    char* path = "home/documents/student/file";
+    parsePath(path);
+    for(int i = 0; i < 52; i++) {
+        for(int j = 0; j < 256; j++) {
+            printf("%c", patharray[i][j]);
+        }
+        printf("\n");
+    }
+
+    return 0;
 }
