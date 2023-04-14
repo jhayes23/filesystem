@@ -46,22 +46,21 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 {
 	printf("Initializing File System with %ld blocks with a block size of %ld\n", numberOfBlocks, blockSize);
 	/* TODO: Add any code you need to initialize your file system. */
-	struct VCB *VCB = malloc(blockSize);
-	if (LBAread(VCB, 1, 0) == 1) // Read block 0 from disk into VCB
+	if (LBAread(vcb, 1, 0) == 1) // Read block 0 from disk into VCB
 	{
 		// init vcb since signature is missing or does not match
-		VCB->signature = magicNumber;
-		VCB->blockSize = blockSize;
-		VCB->totalBlocks = numberOfBlocks;
-		VCB->freeBlocks = numberOfBlocks;
+		vcb->signature = magicNumber;
+		vcb->blockSize = blockSize;
+		vcb->totalBlocks = numberOfBlocks;
+		vcb->freeBlocks = numberOfBlocks;
 
 		// Set vals returned from init procedures
 
-		VCB->freeSpaceManagerBlock = initFreeSpaceManager(VCB->totalBlocks, VCB->blockSize);
-		VCB->rootDirBlock = initRootDir(VCB->blockSize);
+		vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
+		vcb->rootDirBlock = initRootDir(vcb->blockSize);
 
 		// LBAwrite VCB back to disk
-		LBAwrite(VCB, 1, 0);
+		LBAwrite(vcb, 1, 0);
 		// if (VCB->signature != magicNumber) // System not initalized
 		// {
 		// 	// init vcb since signature is missing or does not match
