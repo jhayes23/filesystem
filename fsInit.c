@@ -30,14 +30,16 @@
 int initRootDir(int blockSize)
 {
 	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
-	struct directoryEntry *directory = malloc(initDirAmt * sizeof(directoryEntry));
-	int blocksNeeded = initDirAmt * sizeof(directoryEntry) / blockSize + 1;
-	// ask for blocksNeeded here
-	int firstFreeBlock = findFreeBlocks(blocksNeeded);
-	strncpy(directory[0].fileName, ".", 1);
-	strncpy(directory[1].fileName, "..", 2);
-	LBAwrite(directory, blocksNeeded, firstFreeBlock); // LBA write blocksNeeded blocks starting at firstFreeBlock
-	return firstFreeBlock;							   // return start location
+	
+	// struct directoryEntry *directory = malloc(initDirAmt * sizeof(directoryEntry));
+	// int blocksNeeded = initDirAmt * sizeof(directoryEntry) / blockSize + 1;
+	// // ask for blocksNeeded here
+	// int firstFreeBlock = findFreeBlocks(blocksNeeded);
+	// strncpy(directory[0].fileName, ".", 1);
+	// strncpy(directory[1].fileName, "..", 2);
+	// LBAwrite(directory, blocksNeeded, firstFreeBlock); // LBA write blocksNeeded blocks starting at firstFreeBlock
+	// return firstFreeBlock;							   // return start location
+	initDir(initDirAmt,NULL);
 }
 
 int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
