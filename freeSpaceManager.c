@@ -71,9 +71,6 @@ void setBit(unsigned char *bitMap, int blockNumber)
  */
 int findFreeBlocks(int requestedBlocks)
 {
-    VCB *vcb = malloc(vcb->blockSize);
-    LBAread(vcb, 1, 0);
-    printf("VCB->signature: %d\n", vcb->signature);
     int *freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(int));
 
     int freeSpaceManagerSize = 5 * vcb->blockSize * sizeof(int);
@@ -98,7 +95,7 @@ int findFreeBlocks(int requestedBlocks)
             return i;
         }
     }
-    free(vcb);
-    free(freeSpaceManager);
+    // free(vcb);
+    // free(freeSpaceManager);
     return -1;
 }

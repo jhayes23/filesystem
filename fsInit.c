@@ -65,7 +65,7 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 
 		vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
 		printf("freeSpaceManBlock: %d\n", vcb->freeSpaceManagerBlock);
-		// vcb->rootDirBlock = initRootDir(vcb->blockSize);
+		vcb->rootDirBlock = initRootDir(vcb->blockSize);
 
 		// LBAwrite VCB back to disk
 		LBAwrite(vcb, 1, 0);
