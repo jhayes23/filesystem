@@ -50,7 +50,7 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
     // write back to disk
     LBAwrite(bitMap, freeSpaceManagerBlocks, 1);
 
-    return 6;
+    return freeSpaceManagerBlocks + 1;
 }
 
 void setBit(unsigned char *bitMap, int blockNumber)
