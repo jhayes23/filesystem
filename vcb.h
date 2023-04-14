@@ -14,7 +14,7 @@
  *
  **************************************************************/
 
-typedef struct VCB
+typedef struct
 {
     int signature;             // signature to know if filesystem has been initialized
     int blockSize;             // size of each block
@@ -23,3 +23,5 @@ typedef struct VCB
     int freeSpaceManagerBlock; // starting block for free space manager
     int rootDirBlock;          // starting block for root directory
 } VCB;
+
+extern VCB *vcb;
