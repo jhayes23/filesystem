@@ -13,7 +13,8 @@
  *
  *
  **************************************************************/
-
+#ifndef DIRECTORYENTRY_H
+#define DIRECTORYENTRY_H
 #define DIR 1
 #define FILE 0
 typedef struct directoryEntry
@@ -31,3 +32,4 @@ typedef struct directoryEntry
 
 } directoryEntry;
 extern directoryEntry* initDir(int minNumEntries, directoryEntry*parent);
+#endif

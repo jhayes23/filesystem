@@ -23,3 +23,5 @@ typedef struct
     int freeSpaceManagerBlock; // starting block for free space manager
     int rootDirBlock;          // starting block for root directory
 } VCB;
+
+extern VCB *vcb;

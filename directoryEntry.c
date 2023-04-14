@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include "vcb.h"
+#include "fsLow.h"
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
 directoryEntry* initDir(int minNumEntries, directoryEntry*parent){
