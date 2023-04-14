@@ -5,7 +5,9 @@
         "directoryentry.h": "c",
         "freespacemanager.h": "c",
         "math.h": "c",
-        "types.h": "c"
+        "types.h": "c",
+        "vcb.h": "c",
+        "mfs.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
