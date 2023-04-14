@@ -27,7 +27,7 @@
 #define initDirAmt 52
 #define magicNumber 734743926 // random signature
 
-VCB *vcb;
+VCB *vcb; // global declaration of VCB
 
 int initRootDir(int blockSize)
 {
@@ -56,16 +56,15 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 	if (LBAread(vcb, 1, 0) == 1) // Read block 0 from disk into VCB
 	{
 		// init vcb since signature is missing or does not match
-		printf("vcb: %p\n", vcb);
 		vcb->signature = magicNumber;
-		printf("vcb->signature: %d\n", vcb->signature);
 		vcb->blockSize = blockSize;
 		vcb->totalBlocks = numberOfBlocks;
 		vcb->freeBlocks = numberOfBlocks;
 
 		// Set vals returned from init procedures
 
-		// vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
+		vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
+		printf("freeSpaceManBlock: %d\n", vcb->freeSpaceManagerBlock);
 		// vcb->rootDirBlock = initRootDir(vcb->blockSize);
 
 		// LBAwrite VCB back to disk

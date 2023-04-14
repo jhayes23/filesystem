@@ -42,7 +42,7 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
     memset(bitMap, 0, bytesNeeded);
 
     // mark first 6 blocks is used.
-    for (int i = 0; i < freeSpaceManagerBlocks + 1; i++)
+    for (int i = 0; i < freeSpaceManagerBlocks; i++)
     {
         setBit(bitMap, i);
     }
