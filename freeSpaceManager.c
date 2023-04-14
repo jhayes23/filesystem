@@ -4,9 +4,7 @@
 #include "stdlib.h"
 #include "freeSpaceManager.h"
 #include "stdio.h"
-
-
-
+#include "string.h"
 
 /**
  * initFreeSpaceManager initalizes our bitmap array. We reserve space
@@ -31,7 +29,6 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
     // LBAwrite(freeSpaceManager, freeSpaceManagerBlocks, 1);
     // return 1;
 
-
     // bytes required for our bitmap
     int bytesNeeded = (totalBlocks / 8) + 1;
 
@@ -39,27 +36,24 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
     int freeSpaceManagerBlocks = (bytesNeeded / blockSize) + 1;
 
     // initializing our bitmap
-    unsigned char *bitMap = (unsigned char *) malloc(bytesNeeded);
+    unsigned char *bitMap = (unsigned char *)malloc(bytesNeeded);
 
     // set all the bits to zero
-    memset(bitMap,0,bytesNeeded);
+    memset(bitMap, 0, bytesNeeded);
 
     // mark first 6 blocks is used.
-    for(int i = 0; i < freeSpaceManagerBlocks + 1; i++)
+    for (int i = 0; i < freeSpaceManagerBlocks + 1; i++)
     {
-        setBit(bitMap,i);
+        setBit(bitMap, i);
     }
 
     // write back to disk
-    LBAwrite(bitMap,freeSpaceManagerBlocks,1);
+    LBAwrite(bitMap, freeSpaceManagerBlocks, 1);
 
     return 6;
-
-
 }
 
-
-void setBit(unsigned char*bitMap, int blockNumber) 
+void setBit(unsigned char *bitMap, int blockNumber)
 {
     // get the byte index;
     int byteIndex = blockNumber / 8;
@@ -68,18 +62,7 @@ void setBit(unsigned char*bitMap, int blockNumber)
 
     // set 1 if not zero
     bitMap[byteIndex] = bitMap[byteIndex] | 1 << bitIndex;
-
 }
- 
-
-
-
-
-
-
-
-
-
 
 /**
  * This function allows the file system to request N amount of blocks,
