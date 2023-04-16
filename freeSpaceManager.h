@@ -3,7 +3,7 @@
 
 int initFreeSpaceManager(int totalBlocks, int blockSize);
 int findFreeBlocks(int requestedBlocks);
-void setBit(unsigned char *bitMap, int blockNumber,int isFree);
-int checkBit(int bitIndex);
+void setBit(unsigned char *freeSpaceManager, int blockNumber,int isFree);
+int checkBit(unsigned char * freeSpaceManager,int bitIndex);
 
 #endif

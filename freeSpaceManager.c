@@ -27,22 +27,22 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
     int freeSpaceManagerBlocks = (bytesNeeded / blockSize) + 1;
 
     // initializing our bitmap
-    // bitMap with size 2442 bytes
-    unsigned char *bitMap = (unsigned char *)malloc(bytesNeeded);
+    // freeSpaceManager with size 2442 bytes
+    unsigned char *freeSpaceManager = (unsigned char *)malloc(bytesNeeded);
     
     // set all the bits to zero
-    memset(bitMap, 0, bytesNeeded);
+    memset(freeSpaceManager, 0, bytesNeeded);
 
     // mark first 6 blocks is used.
     // 1 block for VCB and 5 blocks for fsManager
     // total 6 blocks 
     for (int i = 0; i < freeSpaceManagerBlocks + 1; i++)
     {
-        setBit(bitMap, i,1);
+        setBit(freeSpaceManager, i,1);
     }
 
     // write back bitMap to disk
-    LBAwrite(bitMap, freeSpaceManagerBlocks, 1);
+    LBAwrite(freeSpaceManager, freeSpaceManagerBlocks, 1);
 
     // return the starting block of free space
     return 1;
@@ -50,7 +50,7 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
 
 
 
-void setBit(unsigned char * bitMap, int bitIndex, int isFree)
+void setBit(unsigned char * freeSpaceManager, int bitIndex, int isFree)
 {
     // get the byte index;
     int byteIndex = bitIndex / 8;
@@ -62,25 +62,25 @@ void setBit(unsigned char * bitMap, int bitIndex, int isFree)
     if(isFree == 1)
     {
         // setting the bit to 1 if isFree == 1
-        bitMap[byteIndex] = bitMap[byteIndex] | 1 << bitIndexInByte;
+        freeSpaceManager[byteIndex] |= 1 << bitIndexInByte;
     } 
     else
     {
         // setting the bit to zero if isFree == 0
-        bitMap[byteIndex] = bitMap[byteIndex] & ~(1 << bitIndexInByte);
+        freeSpaceManager[byteIndex] &=  ~(1 << bitIndexInByte);
     }
 }
 
 
-int checkBit(int bitIndex)
+int checkBit(unsigned char * freeSpaceManager, int bitIndex)
 {
     int byteIndex = bitIndex / 8;
     int bitIndexInByte = bitIndex % 8;
 
     // checking if the bitIndex is zero (free) or not (not free)
-    // return 0 if it is bitIndex is free
-    // return non-zero integer if not free
-    return (byteIndex & (1 << bitIndexInByte) ) != 0;
+    // return 0 if it is bitIndex is free (represent false in c)
+    // return non-zero integer if not free (retpresent true in c)
+    return (freeSpaceManager[byteIndex] & (1 << bitIndexInByte) ) != 0;
 }
 
 /**
@@ -90,31 +90,72 @@ int checkBit(int bitIndex)
  */
 int findFreeBlocks(int requestedBlocks)
 {
-    int *freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(int));
+    // int *freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(int));
 
-    int freeSpaceManagerSize = 5 * vcb->blockSize * sizeof(int);
-    LBAread(freeSpaceManager, 5, 1);
+    // int freeSpaceManagerSize = 5 * vcb->blockSize * sizeof(int);
+    // LBAread(freeSpaceManager, 5, 1);
 
-    for (int i = 0; i < freeSpaceManagerSize - requestedBlocks + 1; i++)
-    {
-        int freeBlockCount = 0;
-        for (int j = 0; j < requestedBlocks; j++)
-        {
-            if (freeSpaceManager[i + j] == 0)
-            {
-                freeBlockCount++;
-            }
-            else
-            {
-                break;
-            }
-        }
-        if (freeBlockCount == requestedBlocks)
-        {
-            return i;
-        }
-    }
+    // for (int i = 0; i < freeSpaceManagerSize - requestedBlocks + 1; i++)
+    // {
+    //     int freeBlockCount = 0;
+    //     for (int j = 0; j < requestedBlocks; j++)
+    //     {
+    //         if (freeSpaceManager[i + j] == 0)
+    //         {
+    //             freeBlockCount++;
+    //         }
+    //         else
+    //         {
+    //             break;
+    //         }
+    //     }
+    //     if (freeBlockCount == requestedBlocks)
+    //     {
+    //         return i;
+    //     }
+    // }
     // free(vcb);
     // free(freeSpaceManager);
+
+    unsigned char * freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(int));
+    LBAread(freeSpaceManager,5,1);
+
+    int startIndex = -1;
+    int freeBlocks = 0;
+
+    for(int i = 0; i < vcb->totalBlocks - requestedBlocks; i++)
+    {
+        // if checkBit return false
+        // 0(free) reprenset false in c 
+        if(!checkBit(freeSpaceManager,i))
+        {
+            // if first free block
+            if(startIndex == -1)
+            {
+                // set startIndex with first free block
+                startIndex = i;
+            }
+            freeBlocks++;
+
+            if(freeBlocks == requestedBlocks)
+            {
+                // mark those free contiguous blocks as used
+                for(int j = 0; j < requestedBlocks; j++)
+                {
+                    setBit(freeSpaceManager,j,1);
+                }
+
+                return startIndex;
+            }
+        }
+        else 
+        {
+            // resetting if block is not free
+            startIndex = -1;
+            freeBlocks = 0;
+        }
+
+
+    }
     return -1;
 }
