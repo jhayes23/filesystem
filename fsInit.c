@@ -40,9 +40,13 @@ VCB *vcb; // global declaration of VCB
 // 	// strncpy(directory[0].fileName, ".", 1);
 // 	// strncpy(directory[1].fileName, "..", 2);
 // 	// LBAwrite(directory, blocksNeeded, firstFreeBlock); // LBA write blocksNeeded blocks starting at firstFreeBlock
-// 	// return firstFreeBlock;							   // return start location
-// 	directoryEntry *dir = initDir(initDirAmt, NULL);
-// 	return dir; // returns the number of blocks it takes
+// 	// return firstFreeBlock;						   // return start location
+
+// 	int firstFreeBlock = findFreeBlocks(5);
+// 	return firstFreeBlock;
+
+// 	// directoryEntry *dir = initDir(initDirAmt, NULL);
+// 	// return dir; // returns the number of blocks it takes
 // }
 
 int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
@@ -59,17 +63,23 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 		vcb->signature = magicNumber;
 		vcb->blockSize = blockSize;
 		vcb->totalBlocks = numberOfBlocks;
-		vcb->freeBlocks = numberOfBlocks;
+		vcb->freeBlocks = numberOfBlocks - 6;
 
 		// Set vals returned from init procedures
 
 		vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
 		printf("freeSpaceManBlock: %d\n", vcb->freeSpaceManagerBlock);
-		
-		//vcb->rootDirBlock = initRootDir(vcb->blockSize);
+
+		// vcb->rootDirBlock = initRootDir(vcb->blockSize);
+		// printf("Start of RootDir: %d\n",vcb->rootDirBlock);
 
 		// LBAwrite VCB back to disk
 		LBAwrite(vcb, 1, 0);
+
+
+		// unsigned char * testFS = malloc(5 * vcb->blockSize * sizeof(char));
+		// LBAread(testFS,5,vcb->freeSpaceManagerBlock);
+		// printBitMap(testFS);
 		
 		
 		

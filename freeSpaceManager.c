@@ -117,7 +117,7 @@ int findFreeBlocks(int requestedBlocks)
     // free(vcb);
     // free(freeSpaceManager);
 
-    unsigned char * freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(int));
+    unsigned char * freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(char));
     LBAread(freeSpaceManager,5,1);
 
     int startIndex = -1;
@@ -140,11 +140,10 @@ int findFreeBlocks(int requestedBlocks)
             if(freeBlocks == requestedBlocks)
             {
                 // mark those free contiguous blocks as used
-                for(int j = 0; j < requestedBlocks; j++)
+                for(int j = startIndex; j < startIndex + requestedBlocks; j++)
                 {
                     setBit(freeSpaceManager,j,1);
                 }
-
                 return startIndex;
             }
         }
@@ -155,7 +154,28 @@ int findFreeBlocks(int requestedBlocks)
             freeBlocks = 0;
         }
 
-
     }
     return -1;
+}
+
+void freeBlocks(unsigned char * freeSpaceManager, int startIndex,int numberOfBlocks)
+{
+    for(int i = startIndex; i < startIndex + numberOfBlocks; i++)
+    {
+        // setting the bits to zero
+        setBit(freeSpaceManager,i,0);
+    }
+}
+
+void printBitMap(unsigned char * freeSpaceManager)
+{
+    for(int i = 0; i < vcb -> totalBlocks; i++)
+    {
+        printf("%d", checkBit(freeSpaceManager,i) ? 1 : 0);
+        if(i % 64 == 63)
+        {
+            printf("\n");
+        }
+    }
+    printf("\n");
 }
