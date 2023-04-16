@@ -41,7 +41,7 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
     // set all the bits to zero
     memset(bitMap, 0, bytesNeeded);
 
-    // mark first 6 blocks is used.
+    // mark first 5 blocks is used.
     for (int i = 0; i < freeSpaceManagerBlocks; i++)
     {
         setBit(bitMap, i);
@@ -50,7 +50,8 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
     // write back to disk
     LBAwrite(bitMap, freeSpaceManagerBlocks, 1);
 
-    return freeSpaceManagerBlocks + 1;
+    // return the starting block of free space
+    return 1;
 }
 
 void setBit(unsigned char *bitMap, int blockNumber)
