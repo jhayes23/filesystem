@@ -25,25 +25,25 @@
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
 #define initDirAmt 52
-#define magicNumber 734743926 // random signature
+#define magicNumber 734743927 // random signature
 
 VCB *vcb; // global declaration of VCB
 
-int initRootDir(int blockSize)
-{
-	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
+// int initRootDir(int blockSize)
+// {
+// 	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
 
-	// struct directoryEntry *directory = malloc(initDirAmt * sizeof(directoryEntry));
-	// int blocksNeeded = initDirAmt * sizeof(directoryEntry) / blockSize + 1;
-	// // ask for blocksNeeded here
-	// int firstFreeBlock = findFreeBlocks(blocksNeeded);
-	// strncpy(directory[0].fileName, ".", 1);
-	// strncpy(directory[1].fileName, "..", 2);
-	// LBAwrite(directory, blocksNeeded, firstFreeBlock); // LBA write blocksNeeded blocks starting at firstFreeBlock
-	// return firstFreeBlock;							   // return start location
-	directoryEntry *dir = initDir(initDirAmt, NULL);
-	return dir; // returns the number of blocks it takes
-}
+// 	// struct directoryEntry *directory = malloc(initDirAmt * sizeof(directoryEntry));
+// 	// int blocksNeeded = initDirAmt * sizeof(directoryEntry) / blockSize + 1;
+// 	// // ask for blocksNeeded here
+// 	// int firstFreeBlock = findFreeBlocks(blocksNeeded);
+// 	// strncpy(directory[0].fileName, ".", 1);
+// 	// strncpy(directory[1].fileName, "..", 2);
+// 	// LBAwrite(directory, blocksNeeded, firstFreeBlock); // LBA write blocksNeeded blocks starting at firstFreeBlock
+// 	// return firstFreeBlock;							   // return start location
+// 	directoryEntry *dir = initDir(initDirAmt, NULL);
+// 	return dir; // returns the number of blocks it takes
+// }
 
 int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 {
@@ -65,10 +65,14 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 
 		vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
 		printf("freeSpaceManBlock: %d\n", vcb->freeSpaceManagerBlock);
-		vcb->rootDirBlock = initRootDir(vcb->blockSize);
+		
+		//vcb->rootDirBlock = initRootDir(vcb->blockSize);
 
 		// LBAwrite VCB back to disk
 		LBAwrite(vcb, 1, 0);
+		
+		
+		
 		// if (VCB->signature != magicNumber) // System not initalized
 		// {
 		// 	// init vcb since signature is missing or does not match

@@ -6,6 +6,7 @@
 #include "stdio.h"
 #include "string.h"
 
+
 /**
  * initFreeSpaceManager initalizes our bitmap array. We reserve space
  * in memory for the manager, then we fill the first blocks that the manager takes up
@@ -13,56 +14,73 @@
  *
  * We then write to the disk and return the starting position of the freeSpaceManager
  */
+
 int initFreeSpaceManager(int totalBlocks, int blockSize)
 {
-    // // int freeSpaceManagerBlocks = totalBlocks / (8 * blockSize) + 1;
-
-    // int *freeSpaceManager = malloc((freeSpaceManagerBlocks * blockSize) * sizeof(int));
-    // for (int i = 0; i < freeSpaceManagerBlocks; i++)
-    // {
-    //     freeSpaceManager[i] = 1;
-    // }
-    // for (int j = freeSpaceManagerBlocks; j <= freeSpaceManagerBlocks * blockSize; j++)
-    // {
-    //     freeSpaceManager[j] = 0;
-    // }
-    // LBAwrite(freeSpaceManager, freeSpaceManagerBlocks, 1);
-    // return 1;
-
     // bytes required for our bitmap
+    // 1 bit represent 1 block
+    // 19531 blocks == 19531 bits == 2442 bytes
     int bytesNeeded = (totalBlocks / 8) + 1;
 
     // blocks required for our bitmap
+    // 5 blocks
     int freeSpaceManagerBlocks = (bytesNeeded / blockSize) + 1;
 
     // initializing our bitmap
+    // bitMap with size 2442 bytes
     unsigned char *bitMap = (unsigned char *)malloc(bytesNeeded);
-
+    
     // set all the bits to zero
     memset(bitMap, 0, bytesNeeded);
 
-    // mark first 5 blocks is used.
-    for (int i = 0; i < freeSpaceManagerBlocks; i++)
+    // mark first 6 blocks is used.
+    // 1 block for VCB and 5 blocks for fsManager
+    // total 6 blocks 
+    for (int i = 0; i < freeSpaceManagerBlocks + 1; i++)
     {
-        setBit(bitMap, i);
+        setBit(bitMap, i,1);
     }
 
-    // write back to disk
+    // write back bitMap to disk
     LBAwrite(bitMap, freeSpaceManagerBlocks, 1);
 
     // return the starting block of free space
     return 1;
 }
 
-void setBit(unsigned char *bitMap, int blockNumber)
+
+
+void setBit(unsigned char * bitMap, int bitIndex, int isFree)
 {
     // get the byte index;
-    int byteIndex = blockNumber / 8;
+    int byteIndex = bitIndex / 8;
+    // get the bit index in the byte
+    int bitIndexInByte = bitIndex % 8;
 
-    int bitIndex = blockNumber % 8;
+    // 1 => not free
+    // 0 => free
+    if(isFree == 1)
+    {
+        // setting the bit to 1 if isFree == 1
+        bitMap[byteIndex] = bitMap[byteIndex] | 1 << bitIndexInByte;
+    } 
+    else
+    {
+        // setting the bit to zero if isFree == 0
+        bitMap[byteIndex] = bitMap[byteIndex] & ~(1 << bitIndexInByte);
+    }
+}
 
-    // set 1 if not zero
-    bitMap[byteIndex] = bitMap[byteIndex] | 1 << bitIndex;
+
+int checkBit(int bitIndex)
+{
+    int byteIndex = bitIndex / 8;
+    int bitIndexInByte = bitIndex % 8;
+
+    // checking if the bitIndex is zero (free) or not (not free)
+    // return 0 if it is bitIndex is free
+    // return non-zero integer if not free
+    return (byteIndex & (1 << bitIndexInByte) ) != 0;
 }
 
 /**
