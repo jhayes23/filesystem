@@ -13,6 +13,10 @@
  *
  *
  **************************************************************/
+#ifndef DIRECTORYENTRY_H
+#define DIRECTORYENTRY_H
+#define DIR 1
+#define FILE 0
 typedef struct directoryEntry
 {
     // size of struct is 136 bytes
@@ -25,4 +29,7 @@ typedef struct directoryEntry
     time_t lastModifyDate; // timestamp associated when the last write of a file occurs
     char fileName[64];     // string with max 64 characters that contains the file name
     char author[32];       // string with max 32 characters that contains the author name of the file.
+
 } directoryEntry;
+extern directoryEntry* initDir(int minNumEntries, directoryEntry*parent);
+#endif
