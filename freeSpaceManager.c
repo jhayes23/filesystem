@@ -90,32 +90,6 @@ int checkBit(unsigned char * freeSpaceManager, int bitIndex)
  */
 int findFreeBlocks(int requestedBlocks)
 {
-    // int *freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(int));
-
-    // int freeSpaceManagerSize = 5 * vcb->blockSize * sizeof(int);
-    // LBAread(freeSpaceManager, 5, 1);
-
-    // for (int i = 0; i < freeSpaceManagerSize - requestedBlocks + 1; i++)
-    // {
-    //     int freeBlockCount = 0;
-    //     for (int j = 0; j < requestedBlocks; j++)
-    //     {
-    //         if (freeSpaceManager[i + j] == 0)
-    //         {
-    //             freeBlockCount++;
-    //         }
-    //         else
-    //         {
-    //             break;
-    //         }
-    //     }
-    //     if (freeBlockCount == requestedBlocks)
-    //     {
-    //         return i;
-    //     }
-    // }
-    // free(vcb);
-    // free(freeSpaceManager);
 
     unsigned char * freeSpaceManager = malloc(5 * vcb->blockSize * sizeof(char));
     LBAread(freeSpaceManager,5,1);
@@ -167,15 +141,16 @@ void freeBlocks(unsigned char * freeSpaceManager, int startIndex,int numberOfBlo
     }
 }
 
-void printBitMap(unsigned char * freeSpaceManager)
-{
-    for(int i = 0; i < vcb -> totalBlocks; i++)
-    {
-        printf("%d", checkBit(freeSpaceManager,i) ? 1 : 0);
-        if(i % 64 == 63)
-        {
-            printf("\n");
-        }
-    }
-    printf("\n");
-}
+
+// void printBitMap(unsigned char * freeSpaceManager)
+// {
+//     for(int i = 0; i < vcb -> totalBlocks; i++)
+//     {
+//         printf("%d", checkBit(freeSpaceManager,i) ? 1 : 0);
+//         if(i % 64 == 63)
+//         {
+//             printf("\n");
+//         }
+//     }
+//     printf("\n");
+// }

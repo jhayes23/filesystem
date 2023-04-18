@@ -29,25 +29,19 @@
 
 VCB *vcb; // global declaration of VCB
 
-// int initRootDir(int blockSize)
-// {
-// 	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
+int initRootDir(int blockSize)
+{
+	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
 
-// 	// struct directoryEntry *directory = malloc(initDirAmt * sizeof(directoryEntry));
-// 	// int blocksNeeded = initDirAmt * sizeof(directoryEntry) / blockSize + 1;
-// 	// // ask for blocksNeeded here
-// 	// int firstFreeBlock = findFreeBlocks(blocksNeeded);
-// 	// strncpy(directory[0].fileName, ".", 1);
-// 	// strncpy(directory[1].fileName, "..", 2);
-// 	// LBAwrite(directory, blocksNeeded, firstFreeBlock); // LBA write blocksNeeded blocks starting at firstFreeBlock
-// 	// return firstFreeBlock;						   // return start location
-
-// 	int firstFreeBlock = findFreeBlocks(5);
-// 	return firstFreeBlock;
-
-// 	// directoryEntry *dir = initDir(initDirAmt, NULL);
-// 	// return dir; // returns the number of blocks it takes
-// }
+	directoryEntry * dir = (directoryEntry*)malloc(initDirAmt);
+	dir = initDir(initDirAmt,NULL);
+	int rootposition = dir[0].location;
+	
+	free(dir);
+	dir = NULL;
+	
+	return rootposition;
+}
 
 int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 {
@@ -70,18 +64,13 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 		vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
 		printf("freeSpaceManBlock: %d\n", vcb->freeSpaceManagerBlock);
 
-		// vcb->rootDirBlock = initRootDir(vcb->blockSize);
-		// printf("Start of RootDir: %d\n",vcb->rootDirBlock);
+		vcb->rootDirBlock = initRootDir(vcb->blockSize);
+		printf("Start of RootDir: %d\n",vcb->rootDirBlock);
 
 		// LBAwrite VCB back to disk
 		LBAwrite(vcb, 1, 0);
 
 
-		// unsigned char * testFS = malloc(5 * vcb->blockSize * sizeof(char));
-		// LBAread(testFS,5,vcb->freeSpaceManagerBlock);
-		// printBitMap(testFS);
-		
-		
 		
 		// if (VCB->signature != magicNumber) // System not initalized
 		// {
@@ -104,6 +93,7 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 		// 	printf("VCB ALREADY INITALIZED;\nSignature: %d\n", VCB->signature);
 		// }
 	}
+
 	return 0;
 }
 

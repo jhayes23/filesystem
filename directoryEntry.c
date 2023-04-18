@@ -8,6 +8,7 @@
 #include "fsLow.h"
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
+
 directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 {
 	int bytesNeed = minNumEntries * sizeof(directoryEntry);
@@ -35,7 +36,7 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 	dir[0].fileSize = bytesNeed;
 	dir[0].isFile = DIR;
 	strcpy(dir[1].fileName, "..");
-	if (parent = NULL)
+	if (parent ==  NULL)
 	{
 		dir[1].createDate = dir[0].createDate;
 		dir[1].lastModifyDate = dir[0].lastModifyDate;
