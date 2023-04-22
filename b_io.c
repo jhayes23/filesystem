@@ -27,9 +27,11 @@
 typedef struct b_fcb
 {
 	/** TODO add al the information you need in the file control block **/
-	char *buf;	// holds the open file buffer
-	int index;	// holds the current position in the buffer
-	int buflen; // holds how many valid bytes are in the buffer
+	char *buf;		// holds the open file buffer
+	int index;		// holds the current position in the buffer
+	int buflen;		// holds how many valid bytes are in the buffer
+	int currentBlk; // holds the current bloc number
+	int numBlocks;	// holds how many blocks file occupies
 } b_fcb;
 
 b_fcb fcbArray[MAXFCBS];
@@ -67,7 +69,6 @@ b_io_fd b_getFCB()
 b_io_fd b_open(char *filename, int flags)
 {
 	b_io_fd returnFd;
-
 	//*** TODO ***:  Modify to save or set any information needed
 	//
 	//
