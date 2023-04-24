@@ -5,6 +5,7 @@ int fs_isFile(char *fileName)
 {
 
     parsedPath path = parsePath(fileName, NULL);
-    printf("path: %zu", path);
+    int test = 1;
+    printf("Parent Dir Entry Index: %d\n", test);
     return 0;
 }
