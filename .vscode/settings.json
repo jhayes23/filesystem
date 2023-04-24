@@ -7,7 +7,8 @@
         "math.h": "c",
         "types.h": "c",
         "vcb.h": "c",
-        "mfs.h": "c"
+        "mfs.h": "c",
+        "dirent.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

@@ -49,7 +49,7 @@ parsedPath parsePath(char * path, directoryEntry * startPath){
    printf("Path to parse: %s\n",pathname);
    directoryEntry * dir = startPath;
    if(startPath == NULL){
-    dir = vcb->rootDir;
+    dir = vcb->rootDirBlock;
    }else{
     dir = startPath;
    }
