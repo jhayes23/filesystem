@@ -1,5 +1,6 @@
 #include "mfs.h"
 #include "parsePath.h"
+#include <stdio.h>
 
 int fs_isFile(char *fileName)
 {

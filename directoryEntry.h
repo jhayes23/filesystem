@@ -16,7 +16,7 @@
 #ifndef DIRECTORYENTRY_H
 #define DIRECTORYENTRY_H
 #define DIRECTORY 1
-#define FILE 0
+#define FILEMACRO 0
 typedef struct directoryEntry
 {
     // size of struct is 136 bytes
