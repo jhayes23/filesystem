@@ -95,7 +95,7 @@ parsedPath parsePath(const char *path) //Parses a path and returns a struct cont
         token = endingToken;
         endingToken = strtok_r(NULL, "/", &rest);
 
-        if (entryIndex == -1 && (dirToParse[entryIndex].isFile == FILE && endingToken != NULL))
+        if (entryIndex == -1 && (dirToParse[entryIndex].isFile == FILEMACRO && endingToken != NULL))
         {
             // Cannot continue since entry is a file and more to process
             pathRet.index = entryIndex;

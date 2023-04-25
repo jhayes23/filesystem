@@ -8,6 +8,7 @@
 #include "fsLow.h"
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
+#include "mfs.h"
 
 directoryEntry * rootDir;
 char currentWorkDir[]; 
@@ -37,9 +38,9 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 	dir[0].lastAccessDate = t;
 	dir[0].location = startBlock;
 	dir[0].fileSize = bytesNeed;
-	dir[0].isFile = DIR;
+	dir[0].isFile = DIRECTORY;
 	strcpy(dir[1].fileName, "..");
-	if (parent ==  NULL)
+	if (parent == NULL)
 	{
 		dir[1].createDate = dir[0].createDate;
 		dir[1].lastModifyDate = dir[0].lastModifyDate;
@@ -57,6 +58,7 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 		dir[1].fileSize = parent->fileSize;
 		dir[1].isFile = parent->isFile;
 	}
+	fs_isFile(dir[0].fileName);
 	LBAwrite(dir, blkCount, startBlock);
 	return dir;
 }

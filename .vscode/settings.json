@@ -7,7 +7,11 @@
         "math.h": "c",
         "types.h": "c",
         "vcb.h": "c",
-        "mfs.h": "c"
+        "mfs.h": "c",
+        "dirent.h": "c",
+        "b_io.h": "c",
+        "fslow.h": "c",
+        "stdio.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
