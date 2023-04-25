@@ -24,7 +24,6 @@
 #include "vcb.h"
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
-#define initDirAmt 52
 #define magicNumber 734743927 // random signature
 
 VCB *vcb; // global declaration of VCB

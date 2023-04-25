@@ -17,6 +17,7 @@
 #define DIRECTORYENTRY_H
 #define DIR 1
 #define FILE 0
+#define initDirAmt 52
 typedef struct directoryEntry
 {
     // size of struct is 136 bytes
@@ -33,3 +34,6 @@ typedef struct directoryEntry
 } directoryEntry;
 extern directoryEntry* initDir(int minNumEntries, directoryEntry*parent);
 #endif
+
+extern directoryEntry * rootDir;
+extern char currentWorkDir[256];

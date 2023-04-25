@@ -9,6 +9,9 @@
 #include "directoryEntry.h"
 #include "freeSpaceManager.h"
 
+directoryEntry * rootDir;
+char currentWorkDir[]; 
+
 directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 {
 	int bytesNeed = minNumEntries * sizeof(directoryEntry);

@@ -8,13 +8,11 @@
  *
  * File: parsePath.c
  *
- * Description:
+ * Description: Path parser and utility procedures
  *
- * 
+ *
  *
  **************************************************************/
-// /home/student/Documents/myfile
-
 #include <stdio.h>
 #include "mfs.h"
 #include <stdlib.h>
@@ -24,57 +22,117 @@
 #include "vcb.h"
 #include "parsePath.h"
 
-void loadDirectory(directoryEntry * loadDir, directoryEntry * dir){
-    LBAread(loadDir,dir->fileSize/vcb->blockSize,dir->location);
+void loadDirectory(directoryEntry *loadDir, int dirStartBlock) //Loads Directory into memory
+{
+    int bytesNeed = initDirAmt * sizeof(directoryEntry);
+    int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
+    LBAread(loadDir, blkCount, dirStartBlock);
 }
 
-int locateEntry( directoryEntry * dir, char * entry){ // search directory, entry = name
-    for (int i = 0; i < (dir->fileSize)/sizeof(directoryEntry); i++)
+int locateEntry(directoryEntry *dir, char *entry) //Searches parent directory for matching entry
+{ // search directory, entry = name
+    for (int i = 0; i < (dir->fileSize) / sizeof(directoryEntry); i++)
     {
-        printf("I: %d   EntryName: [%s]\n",i,dir[i].fileName);
-        if(strcmp(dir[i].fileName,entry) == 0){
-            printf("FOUND: %s\n",dir[i].fileName);
+        if (strcmp(dir[i].fileName, entry) == 0)
+        {
             return i;
         }
     }
     return -1;
 }
 
-
-parsedPath parsePath(char * path, directoryEntry * startPath){
-
+parsedPath parsePath(const char *path) //Parses a path and returns a struct containing
+//a pointer to the parent directory, the index of entry, and the absolute path
+{
     char pathname[256];
-    strcpy(pathname,path);
-   
-   printf("Path to parse: %s\n",pathname);
-   directoryEntry * dir = startPath;
-   if(startPath == NULL){
-    dir = vcb->rootDir;
-   }else{
-    dir = startPath;
-   }
-    
-    char* token;
-    char* rest;
-    token = strtok_r(pathname,"/",&rest);
-    int entryIndex = -1;
+    strcpy(pathname, path);
+    int bytesNeed = initDirAmt * sizeof(directoryEntry);
+    int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
+    int byteUsed = blkCount * vcb->blockSize;
+    directoryEntry *dirToParse = malloc(byteUsed);
     parsedPath pathRet;
+    pathRet.path = malloc(256);
 
-    while(token != NULL){
-        printf("Token: %s\n",token);
+    if (path == NULL)
+    {
+        pathRet.index = 0;
+        pathRet.parent = NULL;
+        strcpy(pathRet.path, "\0");
+        strcpy(pathRet.dirName, "\0");
+        return pathRet;
+    }
+    else if(strcmp(path,"~") == 0 ){
+        LBAread(dirToParse, blkCount, vcb->rootDirBlock);
+        pathRet.index = 0;
+        pathRet.path = "/";
+        pathRet.parent = dirToParse;
+        return pathRet;
+    }
+    else if (path[0] != '/')
+    {
+        strcpy(pathname, currentWorkDir);
+        int lastChar = (int)strlen(pathname) - 1;
+        if (pathname[lastChar] != '/')
+        {
+            strcat(pathname, "/");
+        }
+        strcat(pathname, path);
+        strcpy(pathRet.path, pathname);
+    }
+    LBAread(dirToParse, blkCount, vcb->rootDirBlock);
+    char *token;
+    char *endingToken = NULL;
+    char *rest;
+    token = strtok_r(pathname, "/", &rest);
+    if (token != NULL)
+    {
+        endingToken = strtok_r(NULL, "/", &rest);
+    }
+    int entryIndex = -1;
+    while (endingToken != NULL)
+    {
+        entryIndex = locateEntry(dirToParse, token);
+        token = endingToken;
+        endingToken = strtok_r(NULL, "/", &rest);
 
-        entryIndex = locateEntry(dir,token);
-        token = strtok_r(NULL,"/",&rest);
-        if(entryIndex == -1 || (dir[entryIndex].isFile == FILE && token != NULL)){
-            
-                pathRet.index = entryIndex;
-                pathRet.parent = NULL;
+        if (entryIndex == -1 && (dirToParse[entryIndex].isFile == FILE && endingToken != NULL))
+        {
+            // Cannot continue since entry is a file and more to process
+            pathRet.index = entryIndex;
+            pathRet.parent = NULL;
             return pathRet;
         }
-        loadDirectory(dir,dir+entryIndex);
+
+        loadDirectory(dirToParse, dirToParse[entryIndex].location);
     }
-    
-    pathRet.index = entryIndex;
-    pathRet.parent = dir;
+    pathRet.index = locateEntry(dirToParse, token);
+    pathRet.parent = dirToParse;
+    strcpy(pathRet.dirName, token);
+
     return pathRet;
+}
+
+int findOpenEntrySlot(directoryEntry *parent) //Searches parent dir for open dir entry
+{
+    for (int i = 0; i < (parent->fileSize) / sizeof(directoryEntry); i++)
+    {
+        if (strcmp(parent[i].fileName, "\0") == 0)
+        {
+            return i;
+        }
+    }
+    printf("No available entries.\n");
+    return -1;
+}
+
+int directoryIsEmpty(directoryEntry *parent) // Checks if parent directory has any sub entries
+{
+    for (int i = 2; i < (parent->fileSize) / sizeof(directoryEntry); i++)
+    {
+        if (strcmp(parent[i].fileName, "\0") != 0)
+        {
+            return -1;
+        }
+    }
+    return 0;
 }
