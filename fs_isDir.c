@@ -2,7 +2,7 @@
 #include "directoryEntry.h"
 #include "parsePath.h"
 
-int fs_isDir(char *fileName)
+int fs_isDir(char *filename)
 {
 
     parsedPath path = parsePath(fileName);
