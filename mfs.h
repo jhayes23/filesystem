@@ -52,6 +52,9 @@ typedef struct
 	unsigned short d_reclen;		 /*length of this record */
 	unsigned short dirEntryPosition; /*which directory entry position, like file pos */
 	uint64_t directoryStartLocation; /*Starting LBA of directory */
+	time_t lastAccessDate;
+	struct fs_diriteminfo *dirinfo;
+	directoryEntry *DE;
 } fdDir;
 
 // Key directory functions
