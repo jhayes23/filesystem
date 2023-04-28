@@ -19,8 +19,11 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <time.h>
 #include "b_io.h"
-
+#include "vcb.h"
+#include "parsePath.h"
+#include "freeSpaceManager.h"
 #define MAXFCBS 20
 #define B_CHUNK_SIZE 512
 
@@ -32,6 +35,7 @@ typedef struct b_fcb
 	int buflen;		// holds how many valid bytes are in the buffer
 	int currentBlk; // holds the current bloc number
 	int numBlocks;	// holds how many blocks file occupies
+	int flags;
 } b_fcb;
 
 b_fcb fcbArray[MAXFCBS];
@@ -78,7 +82,16 @@ b_io_fd b_open(char *filename, int flags)
 
 	returnFd = b_getFCB(); // get our own file descriptor
 						   // check for error - all used FCB's
-
+	if(returnFd<0){
+		return -1;
+	}
+	parsedPath parsed = parsePath(filename);
+	fcbArray[returnFd].flags = flags;
+	fcbArray[returnFd].buf = malloc(vcb->blockSize);
+	fcbArray[returnFd].buflen = 0;
+	fcbArray[returnFd].index = 0;
+	fcbArray[returnFd].currentBlk = parsed.parent[parsed.index].location;
+	fcbArray[returnFd].numBlocks = (parsed.parent[parsed.index].fileSize+vcb->blockSize-1)/vcb->blockSize;
 	return (returnFd); // all set
 }
 
