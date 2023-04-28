@@ -1,5 +1,4 @@
 #include "mfs.h"
-#include <stdio.h>
 #include "directoryEntry.h"
 #include "parsePath.h"
 

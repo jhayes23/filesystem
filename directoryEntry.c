@@ -58,6 +58,8 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 		dir[1].fileSize = parent->fileSize;
 		dir[1].isFile = parent->isFile;
 	}
+	int test = fs_isDir(dir[0].fileName);
+	printf("DIRECTORY: %d\n", test);
 	LBAwrite(dir, blkCount, startBlock);
 	return dir;
 }
