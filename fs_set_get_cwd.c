@@ -9,7 +9,7 @@ int fs_setcwd(char *pathname)
     // pathname has to exist
     // the last element has to be a direcotry
 
-    parsedPath path = parsedPath(pathname);
+    parsePath path = parsePath(pathname);
 
     if(path.parent != NULL)
     {
