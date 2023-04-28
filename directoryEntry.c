@@ -10,8 +10,8 @@
 #include "freeSpaceManager.h"
 #include "mfs.h"
 
-directoryEntry * rootDir;
-char currentWorkDir[]; 
+directoryEntry *rootDir;
+char currentWorkDir[];
 
 directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 {
@@ -58,7 +58,6 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 		dir[1].fileSize = parent->fileSize;
 		dir[1].isFile = parent->isFile;
 	}
-	fs_isFile(dir[0].fileName);
 	LBAwrite(dir, blkCount, startBlock);
 	return dir;
 }

@@ -7,7 +7,11 @@ int fs_isFile(char *fileName)
 {
 
     parsedPath path = parsePath(fileName);
-    int test = 1;
-    printf("Parent Dir Entry Index: %d\n", test);
+    directoryEntry *dir = path.parent;
+
+    if (dir->isFile == FILEMACRO)
+    {
+        return 1;
+    }
     return 0;
 }
