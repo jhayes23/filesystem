@@ -5,7 +5,7 @@
 int fs_isFile(char *filename)
 {
 
-    parsedPath path = parsePath(fileName);
+    parsedPath path = parsePath(filename);
     directoryEntry *dir = path.parent;
 
     if (dir->isFile == FILEMACRO)
