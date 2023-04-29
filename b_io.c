@@ -82,16 +82,17 @@ b_io_fd b_open(char *filename, int flags)
 
 	returnFd = b_getFCB(); // get our own file descriptor
 						   // check for error - all used FCB's
-	if(returnFd<0){
+	if (returnFd < 0)
+	{
 		return -1;
 	}
 	parsedPath parsed = parsePath(filename);
 	fcbArray[returnFd].flags = flags;
 	fcbArray[returnFd].buf = malloc(vcb->blockSize);
-	fcbArray[returnFd].buflen = 0;
+	fcbArray[returnFd].buflen = vcb->blockSize;
 	fcbArray[returnFd].index = 0;
 	fcbArray[returnFd].currentBlk = parsed.parent[parsed.index].location;
-	fcbArray[returnFd].numBlocks = (parsed.parent[parsed.index].fileSize+vcb->blockSize-1)/vcb->blockSize;
+	fcbArray[returnFd].numBlocks = (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1) / vcb->blockSize;
 	return (returnFd); // all set
 }
 
