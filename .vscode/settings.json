@@ -11,7 +11,8 @@
         "dirent.h": "c",
         "b_io.h": "c",
         "fslow.h": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "time.h": "c"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

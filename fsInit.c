@@ -32,13 +32,13 @@ int initRootDir(int blockSize)
 {
 	// 52 directory entries * 136 sizeof 1 directory entry = 7072 bytes/ 512 chunks = 14 blocks
 
-	directoryEntry * dir = (directoryEntry*)malloc(initDirAmt);
-	dir = initDir(initDirAmt,NULL);
+	directoryEntry *dir = (directoryEntry *)malloc(initDirAmt);
+	dir = initDir(initDirAmt, NULL);
 	int rootposition = dir[0].location;
-	
+
 	free(dir);
 	dir = NULL;
-	
+
 	return rootposition;
 }
 
@@ -52,45 +52,43 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 
 	if (LBAread(vcb, 1, 0) == 1) // Read block 0 from disk into VCB
 	{
-		// init vcb since signature is missing or does not match
-		vcb->signature = magicNumber;
-		vcb->blockSize = blockSize;
-		vcb->totalBlocks = numberOfBlocks;
-		vcb->freeBlocks = numberOfBlocks - 6;
+		// // init vcb since signature is missing or does not match
+		// vcb->signature = magicNumber;
+		// vcb->blockSize = blockSize;
+		// vcb->totalBlocks = numberOfBlocks;
+		// vcb->freeBlocks = numberOfBlocks - 6;
 
-		// Set vals returned from init procedures
+		// // Set vals returned from init procedures
 
-		vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
-		printf("freeSpaceManBlock: %d\n", vcb->freeSpaceManagerBlock);
+		// vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
+		// printf("freeSpaceManBlock: %d\n", vcb->freeSpaceManagerBlock);
 
-		vcb->rootDirBlock = initRootDir(vcb->blockSize);
-		printf("Start of RootDir: %d\n",vcb->rootDirBlock);
+		// vcb->rootDirBlock = initRootDir(vcb->blockSize);
+		// printf("Start of RootDir: %d\n",vcb->rootDirBlock);
 
-		// LBAwrite VCB back to disk
-		LBAwrite(vcb, 1, 0);
+		// // LBAwrite VCB back to disk
+		// LBAwrite(vcb, 1, 0);
 
+		if (vcb->signature != magicNumber) // System not initalized
+		{
+			// init vcb since signature is missing or does not match
+			vcb->signature = magicNumber;
+			vcb->blockSize = blockSize;
+			vcb->totalBlocks = numberOfBlocks;
+			vcb->freeBlocks = numberOfBlocks;
 
-		
-		// if (VCB->signature != magicNumber) // System not initalized
-		// {
-		// 	// init vcb since signature is missing or does not match
-		// 	VCB->signature = magicNumber;
-		// 	VCB->blockSize = blockSize;
-		// 	VCB->totalBlocks = numberOfBlocks;
-		// 	VCB->freeBlocks = numberOfBlocks;
+			// Set vals returned from init procedures
 
-		// 	// Set vals returned from init procedures
+			vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
+			vcb->rootDirBlock = initRootDir(vcb->blockSize);
 
-		// 	VCB->freeSpaceManagerBlock = initFreeSpaceManager(VCB->totalBlocks, VCB->blockSize);
-		// 	VCB->rootDirBlock = initRootDir(VCB->blockSize);
-
-		// 	LBAwrite(VCB, 1, 0); // LBAwrite VCB back to disk
-		// }
-		// else
-		// {
-		// 	// loadFreeSpace into memory
-		// 	printf("VCB ALREADY INITALIZED;\nSignature: %d\n", VCB->signature);
-		// }
+			LBAwrite(vcb, 1, 0); // LBAwrite VCB back to disk
+		}
+		else
+		{
+			// loadFreeSpace into memory
+			printf("VCB ALREADY INITALIZED;\nSignature: %d\n", vcb->signature);
+		}
 	}
 
 	return 0;

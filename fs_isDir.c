@@ -2,10 +2,10 @@
 #include "directoryEntry.h"
 #include "parsePath.h"
 
-int fs_isDir(char *fileName)
+int fs_isDir(char *filename)
 {
 
-    parsedPath path = parsePath(fileName);
+    parsedPath path = parsePath(filename);
     directoryEntry *dir = path.parent;
 
     if (dir->isFile == DIRECTORY)
