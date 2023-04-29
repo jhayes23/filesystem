@@ -24,6 +24,7 @@
 #include "vcb.h"
 #include "parsePath.h"
 #include "freeSpaceManager.h"
+#include "directoryEntry.h"
 #define MAXFCBS 20
 #define B_CHUNK_SIZE 512
 
@@ -36,6 +37,7 @@ typedef struct b_fcb
 	int currentBlk; // holds the current bloc number
 	int numBlocks;	// holds how many blocks file occupies
 	int flags;
+	off_t offset;
 } b_fcb;
 
 b_fcb fcbArray[MAXFCBS];
@@ -86,10 +88,33 @@ b_io_fd b_open(char *filename, int flags)
 		return -1;
 	}
 	parsedPath parsed = parsePath(filename);
+	int pos=0;
+	//if file exists
+	if(parsed.parent==-1){
+		if(flags & O_CREAT){
+			time_t t= time(NULL);
+			int start = findOpenEntrySlot(parsed.parent);
+			strcpy(parsed.parent[start].fileName,parsed.childName);
+			parsed.parent[start]->createDate=t;
+			parsed.parent[start]->lastAccessDate=t;
+			parsed.parent[start]->lastModifyDate=t;
+			parsed.parent[start]->fileSize = 0;
+			parsed.parent[start]->isFile = FILEMACRO;
+		}
+	}else{
+		if(flags & O_TRUNC){
+			parsed.parent[parsed.index].fileSize = 0;
+		}
+		if(flags & O_APPEND){
+			//move file position to end
+			pos=(parsed.parent[parsed.index].fileSize-1);
+		}
+	}
 	fcbArray[returnFd].flags = flags;
 	fcbArray[returnFd].buf = malloc(vcb->blockSize);
 	fcbArray[returnFd].buflen = 0;
 	fcbArray[returnFd].index = 0;
+	fcbArray[returnFd].offset = pos;
 	fcbArray[returnFd].currentBlk = parsed.parent[parsed.index].location;
 	fcbArray[returnFd].numBlocks = (parsed.parent[parsed.index].fileSize+vcb->blockSize-1)/vcb->blockSize;
 	return (returnFd); // all set

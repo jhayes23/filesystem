@@ -108,7 +108,7 @@ parsedPath parsePath(const char *path) //Parses a path and returns a struct cont
     pathRet.index = locateEntry(dirToParse, token);
     pathRet.parent = dirToParse;
     strcpy(pathRet.dirName, token);
-
+    strcpy(pathRet.childName, endingToken);
     return pathRet;
 }
 

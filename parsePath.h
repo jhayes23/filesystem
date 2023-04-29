@@ -17,6 +17,7 @@ typedef struct
 {
     int index;
     char dirName[64];
+    char childName[64];
     char  * path;
     directoryEntry * parent; 
 }parsedPath;
