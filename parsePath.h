@@ -13,6 +13,7 @@
  * 
  *
  **************************************************************/
+#include "directoryEntry.h"
 typedef struct
 {
     int index;
