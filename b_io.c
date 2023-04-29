@@ -35,6 +35,7 @@ typedef struct b_fcb
 	int buflen;		// holds how many valid bytes are in the buffer
 	int currentBlk; // holds the current bloc number
 	int numBlocks;	// holds how many blocks file occupies
+	int fileOffset; // holds the current position that the file is at
 	int flags;
 } b_fcb;
 
@@ -93,6 +94,7 @@ b_io_fd b_open(char *filename, int flags)
 	fcbArray[returnFd].index = 0;
 	fcbArray[returnFd].currentBlk = parsed.parent[parsed.index].location;
 	fcbArray[returnFd].numBlocks = (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1) / vcb->blockSize;
+	fcbArray[returnFd].fileOffset = 0;
 	return (returnFd); // all set
 }
 
@@ -107,8 +109,23 @@ int b_seek(b_io_fd fd, off_t offset, int whence)
 	{
 		return (-1); // invalid file descriptor
 	}
+	if (whence == SEEK_SET)
+	{
+		//repositions the file offset to the offset passed by the caller.
+		fcbArray[fd].fileOffset = offset;
+	}
+	else if (whence == SEEK_CUR)
+	{
+		//repositions the file offset to the current location plus caller offset bytes
+		fcbArray[fd].fileOffset += offset;
+	}
+	else if (whence == SEEK_END) 
+	{
+		// repositions the file offset to the size of the file plus caller offset bytes
+		fcbArray[fd].fileOffset = (fcbArray[fd].numBlocks * B_CHUNK_SIZE) + offset;
+	}
 
-	return (0); // Change this
+	return fcbArray[fd].fileOffset; // Change this
 }
 
 // Interface to write function
