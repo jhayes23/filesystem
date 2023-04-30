@@ -37,9 +37,9 @@ typedef struct b_fcb
 	int buflen;		// holds how many valid bytes are in the buffer
 	int currentBlk; // holds the current bloc number
 	int numBlocks;	// holds how many blocks file occupies
-	int fileSize;
 	int fileOffset; // holds the current position that the file is at
 	int flags;
+	directoryEntry * DE;
 } b_fcb;
 
 b_fcb fcbArray[MAXFCBS];
@@ -92,6 +92,7 @@ b_io_fd b_open(char *filename, int flags)
 	}
 	parsedPath parsed = parsePath(filename);
 	int pos=0;
+	fcbArray[returnFd].DE = malloc(sizeof(directoryEntry));
 	//if file exists
 	if(parsed.index==-1){
 		if(flags & O_CREAT){
@@ -103,6 +104,7 @@ b_io_fd b_open(char *filename, int flags)
 			parsed.parent[start].lastModifyDate=t;
 			parsed.parent[start].fileSize = 0;
 			parsed.parent[start].isFile = FILEMACRO;
+			memcpy(fcbArray[returnFd].DE, &parsed.parent[start],sizeof(directoryEntry));
 		}
 	}else{
 		if(flags & O_TRUNC){
@@ -112,13 +114,13 @@ b_io_fd b_open(char *filename, int flags)
 			//move file position to end
 			pos=(parsed.parent[parsed.index].fileSize-1);
 		}
+		memcpy(fcbArray[returnFd].DE, &parsed.parent[parsed.index],sizeof(directoryEntry));
 	}
 	fcbArray[returnFd].flags = flags;
 	fcbArray[returnFd].buf = malloc(vcb->blockSize);
 	fcbArray[returnFd].buflen = vcb->blockSize;
 	fcbArray[returnFd].index = 0;
-	fcbArray[returnFd].currentBlk = parsed.parent[parsed.index].location;
-	fcbArray[returnFd].fileSize = parsed.parent[parsed.index].fileSize;
+	fcbArray[returnFd].currentBlk = 0;
 	fcbArray[returnFd].numBlocks = (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1) / vcb->blockSize;
 	fcbArray[returnFd].fileOffset = pos;
 	return (returnFd); // all set
@@ -165,6 +167,13 @@ int b_write(b_io_fd fd, char *buffer, int count)
 	{
 		return (-1); // invalid file descriptor
 	}
+	if(!((fcbArray[fd].flags&O_WRONLY)||(fcbArray[fd].flags&O_RDWR))){
+		printf("This file cannot write\n");
+		return -1;
+	}
+	fcbArray[fd].currentBlk = fcbArray[fd].fileOffset/vcb->blockSize;
+	int blockindex = fcbArray[fd].fileOffset%vcb->blockSize;
+	
 
 	return (0); // Change this
 }
@@ -204,8 +213,12 @@ int b_read(b_io_fd fd, char *buffer, int count)
 		printf("This file cannot read\n");
 		return -1;
 	}
-	if(count+fcbArray[fd].fileOffset>fcbArray[fd].fileSize){
-		count = fcbArray[fd].fileSize - fcbArray[fd].fileOffset;
+	if(fcbArray[fd].DE == NULL){
+		printf("This file have not opened yet\n");
+		return -1;
+	}
+	if(count+fcbArray[fd].fileOffset>fcbArray[fd].DE->fileSize){
+		count = fcbArray[fd].DE->fileSize - fcbArray[fd].fileOffset;
 	}
 	int remain = fcbArray[fd].buflen - fcbArray[fd].index;
 	if(count>remain){
@@ -220,25 +233,26 @@ int b_read(b_io_fd fd, char *buffer, int count)
 		part2 = 0;
 		part3 = 0;
 	}
-	LBAread(fcbArray[fd].buf,1,fcbArray[fd].currentBlk);
-	
+	LBAread(fcbArray[fd].buf,1,fcbArray[fd].DE->location+fcbArray[fd].currentBlk);
+	fcbArray[fd].currentBlk++;
 	if(part1>0){
 		memcpy(buffer,fcbArray[fd].buf+fcbArray[fd].index,part1);
 	}
 	// if part2>0 it's larger than a blocksize
 	if(part2>0){
 		
-		LBAread(buffer+part1,blocks,fcbArray[fd].currentBlk+1);
+		LBAread(buffer+part1,blocks,fcbArray[fd].DE->location+fcbArray[fd].currentBlk);
+		fcbArray[fd].currentBlk+=blocks;
 		
 	}
 	if(part3>0){
-		LBAread(fcbArray[fd].buf,1,fcbArray[fd].currentBlk+blocks);
+		LBAread(fcbArray[fd].buf,1,fcbArray[fd].DE->location+fcbArray[fd].currentBlk);
 		fcbArray[fd].index=0;
 		memcpy(buffer+part1+part2,fcbArray[fd].buf+fcbArray[fd].index,part3);
 	}
 	int bytesRead = part1+part2+part3;
 	fcbArray[fd].fileOffset+=bytesRead;
-
+	fcbArray[fd].DE->lastAccessDate = time(NULL);
 	return count; // Change this
 }
 
