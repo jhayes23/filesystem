@@ -79,6 +79,13 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 
 			// Set vals returned from init procedures
 
+			// struct fs_stat *test;
+			// int result = fs_stat("~",test);
+			// printf("RESULT : %d\n",result);
+
+
+
+
 			vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
 			vcb->rootDirBlock = initRootDir(vcb->blockSize);
 

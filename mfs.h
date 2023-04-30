@@ -85,6 +85,7 @@ struct fs_stat
 	time_t st_createtime; /* time of last status change */
 
 	/* add additional attributes here for your file system */
+
 };
 
 int fs_stat(const char *path, struct fs_stat *buf);
