@@ -21,7 +21,9 @@ typedef struct
     int totalBlocks;           // total blocks available
     int freeBlocks;            // number of free blocks
     int freeSpaceManagerBlock; // starting block for free space manager
+    int sizeOfFreeSpaceManager; // size of freeSpace manager
     int rootDirBlock;          // starting block for root directory
+    int rootDirSize;           // size of rootDirectory
 } VCB;
 
 extern VCB *vcb;
