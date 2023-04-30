@@ -200,7 +200,7 @@ int b_read(b_io_fd fd, char *buffer, int count)
 	{
 		return (-1); // invalid file descriptor
 	}
-	if(fcbArray[fd].flags & O_WRONLY){
+	if(!((fcbArray[fd].flags&O_RDONLY)||(fcbArray[fd].flags&O_RDWR))){
 		printf("This file cannot read\n");
 		return -1;
 	}
