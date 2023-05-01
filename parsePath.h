@@ -28,3 +28,4 @@ int locateEntry( directoryEntry * dir, char * entry);
 parsedPath parsePath(const char * path);
 int findOpenEntrySlot(directoryEntry * parent);
 int directoryIsEmpty(directoryEntry * parent);
+char * resolvePath(const char *path);

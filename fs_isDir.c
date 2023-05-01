@@ -1,3 +1,18 @@
+/**************************************************************
+ * Class:  CSC-415-01 Spring 2023
+ * Names: Anthony Benjamin, Nyan Ye Lin, Joshua Hayes, David Chen
+ * Student IDs: 921119898, 921572181, 922379312, 922894099
+ * GitHub Name: copbrick
+ * Group Name: Team DALJ
+ * Project: Basic File System
+ *
+ * File: fs_isDir
+ *
+ * Description: Checks if directory entry at a path is a directory
+ *
+ *
+ *
+ **************************************************************/
 #include "mfs.h"
 #include "directoryEntry.h"
 #include "parsePath.h"

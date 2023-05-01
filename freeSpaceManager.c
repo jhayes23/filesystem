@@ -1,3 +1,18 @@
+/**************************************************************
+ * Class:  CSC-415-01 Spring 2023
+ * Names: Anthony Benjamin, Nyan Ye Lin, Joshua Hayes, David Chen
+ * Student IDs: 921119898, 921572181, 922379312, 922894099
+ * GitHub Name: copbrick
+ * Group Name: Team DALJ
+ * Project: Basic File System
+ *
+ * File: freeSpaceManager.c
+ *
+ * Description: Manages free space within filesystem
+ *
+ *
+ *
+ **************************************************************/
 #include <sys/types.h>
 #include "vcb.h"
 #include "fsLow.h"
@@ -25,6 +40,7 @@ int initFreeSpaceManager(int totalBlocks, int blockSize)
     // blocks required for our bitmap
     // 5 blocks
     int freeSpaceManagerBlocks = (bytesNeeded / blockSize) + 1;
+    vcb->sizeOfFreeSpaceManager = freeSpaceManagerBlocks;
 
     // initializing our bitmap
     // freeSpaceManager with size 2442 bytes
@@ -118,6 +134,8 @@ int findFreeBlocks(int requestedBlocks)
                 {
                     setBit(freeSpaceManager,j,1);
                 }
+                // write back bitMap to disk
+                LBAwrite(freeSpaceManager,5,1);
                 return startIndex;
             }
         }
@@ -139,6 +157,7 @@ void freeBlocks(unsigned char * freeSpaceManager, int startIndex,int numberOfBlo
         // setting the bits to zero
         setBit(freeSpaceManager,i,0);
     }
+    LBAwrite(freeSpaceManager,5,1);
 }
 
 

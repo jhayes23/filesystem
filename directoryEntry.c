@@ -1,3 +1,18 @@
+/**************************************************************
+ * Class:  CSC-415-01 Spring 2023
+ * Names: Anthony Benjamin, Nyan Ye Lin, Joshua Hayes, David Chen
+ * Student IDs: 921119898, 921572181, 922379312, 922894099
+ * GitHub Name: copbrick
+ * Group Name: Team DALJ
+ * Project: Basic File System
+ *
+ * File: directoryEntry.c
+ *
+ * Description: Creates a directory within a given directory
+ *
+ *
+ *
+ **************************************************************/
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -10,10 +25,11 @@
 #include "freeSpaceManager.h"
 #include "mfs.h"
 
-directoryEntry *rootDir;
-char currentWorkDir[];
+char currentWorkDir[]; //global var to store cwd
 
 directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
+//Creates a directory within a given directory
+
 {
 	int bytesNeed = minNumEntries * sizeof(directoryEntry);
 	int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
@@ -23,16 +39,16 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 
 	directoryEntry *dir = malloc(byteUsed);
 
-	int startBlock = findFreeBlocks(blkCount);
-	printf("startblock: %d\n", startBlock);
+	int startBlock = findFreeBlocks(blkCount); //Requests a starting block from freespace
 
-	for (int i = 2; i < trueNumEntries; i++)
+	for (int i = 2; i < trueNumEntries; i++) //sets the directories as available for use
 	{
 		strcpy(dir[i].fileName, "\0");
 	}
 
-	time_t t = time(NULL);
-	strcpy(dir[0].fileName, ".");
+	time_t t = time(NULL); //new time instance
+	//create "." folder and initalize all its metadata
+	strcpy(dir[0].fileName, "."); 
 	dir[0].createDate = t;
 	dir[0].lastModifyDate = t;
 	dir[0].lastAccessDate = t;
@@ -42,6 +58,8 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 	strcpy(dir[1].fileName, "..");
 	if (parent == NULL)
 	{
+		//if parent == NULL, the root directory will be created as ".."(parent)
+		//initialize metadata
 		dir[1].createDate = dir[0].createDate;
 		dir[1].lastModifyDate = dir[0].lastModifyDate;
 		dir[1].lastAccessDate = dir[0].lastAccessDate;
@@ -51,6 +69,7 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 	}
 	else
 	{
+		//else give the parent's metadata and info to ".."
 		dir[1].createDate = parent->createDate;
 		dir[1].lastModifyDate = parent->lastModifyDate;
 		dir[1].lastAccessDate = parent->lastAccessDate;
@@ -58,6 +77,6 @@ directoryEntry *initDir(int minNumEntries, directoryEntry *parent)
 		dir[1].fileSize = parent->fileSize;
 		dir[1].isFile = parent->isFile;
 	}
-	LBAwrite(dir, blkCount, startBlock);
+	LBAwrite(dir, blkCount, startBlock); //write back to disk
 	return dir;
 }
