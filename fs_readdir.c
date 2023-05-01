@@ -7,6 +7,7 @@
 #include "parsePath.h"
 #include "vcb.h"
 #include "fsLow.h"
+
 struct fs_diriteminfo *fs_readdir(fdDir *dirp)
 {
     if (dirp == NULL)

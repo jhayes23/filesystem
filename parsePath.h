@@ -13,10 +13,12 @@
  * 
  *
  **************************************************************/
+#include "directoryEntry.h"
 typedef struct
 {
     int index;
     char dirName[64];
+    char childName[64];
     char  * path;
     directoryEntry * parent; 
 }parsedPath;
@@ -26,3 +28,4 @@ int locateEntry( directoryEntry * dir, char * entry);
 parsedPath parsePath(const char * path);
 int findOpenEntrySlot(directoryEntry * parent);
 int directoryIsEmpty(directoryEntry * parent);
+char * resolvePath(const char *path);

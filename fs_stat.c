@@ -1,0 +1,50 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include "directoryEntry.h"
+#include "mfs.h"
+#include "parsePath.h"
+#include "vcb.h"
+#include "fsLow.h"
+
+
+
+
+int fs_stat(const char * path, struct fs_stat *buf)
+{
+    parsedPath parsed = parsePath(path);
+    
+    int index = parsed.index;
+
+    printf("Index From Parsed Path: %d\n", index);
+
+    buf = malloc(sizeof(fs_stat) * 100);
+
+    if (index > -1)
+    {
+        buf->st_size = parsed.parent[index].fileSize;
+        printf("Size : %ld\n", buf->st_size);
+        
+        buf->st_blksize = vcb->blockSize;
+        printf("Block Size : %ld\n", buf->st_blksize);
+        
+        buf->st_blocks = (parsed.parent[index].fileSize / vcb->blockSize) + 1;
+        printf("Number of Blocks: %ld\n", buf->st_blocks);
+        
+        buf->st_accesstime = parsed.parent[index].lastAccessDate;
+        printf("Access Time %ld\n", parsed.parent[index].lastAccessDate);
+        
+        buf->st_modtime = parsed.parent[index].lastModifyDate;
+        printf("Modified Time : %ld\n",buf->st_modtime);
+        
+        buf->st_createtime = parsed.parent[index].createDate;
+        printf("Create Time : %ld\n", buf->st_createtime);
+
+        return 0;
+        
+    }
+
+
+    return -1;
+}

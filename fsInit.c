@@ -13,7 +13,6 @@
  * This file is where you will start and initialize your system
  *
  **************************************************************/
-
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -47,27 +46,9 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 	printf("Initializing File System with %ld blocks with a block size of %ld\n", numberOfBlocks, blockSize);
 	/* TODO: Add any code you need to initialize your file system. */
 	vcb = malloc(blockSize);
-	int blocksRead = LBAread(vcb, 1, 0);
-	printf("blocksRead: %d\n", blocksRead);
 
 	if (LBAread(vcb, 1, 0) == 1) // Read block 0 from disk into VCB
 	{
-		// // init vcb since signature is missing or does not match
-		// vcb->signature = magicNumber;
-		// vcb->blockSize = blockSize;
-		// vcb->totalBlocks = numberOfBlocks;
-		// vcb->freeBlocks = numberOfBlocks - 6;
-
-		// // Set vals returned from init procedures
-
-		// vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
-		// printf("freeSpaceManBlock: %d\n", vcb->freeSpaceManagerBlock);
-
-		// vcb->rootDirBlock = initRootDir(vcb->blockSize);
-		// printf("Start of RootDir: %d\n",vcb->rootDirBlock);
-
-		// // LBAwrite VCB back to disk
-		// LBAwrite(vcb, 1, 0);
 
 		if (vcb->signature != magicNumber) // System not initalized
 		{
@@ -77,8 +58,11 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 			vcb->totalBlocks = numberOfBlocks;
 			vcb->freeBlocks = numberOfBlocks;
 
-			// Set vals returned from init procedures
+			// struct fs_stat *test;
+			// int result = fs_stat("~",test);
+			// printf("RESULT : %d\n",result);
 
+			// Set vals returned from init procedures
 			vcb->freeSpaceManagerBlock = initFreeSpaceManager(vcb->totalBlocks, vcb->blockSize);
 			vcb->rootDirBlock = initRootDir(vcb->blockSize);
 
@@ -87,14 +71,17 @@ int initFileSystem(uint64_t numberOfBlocks, uint64_t blockSize)
 		else
 		{
 			// loadFreeSpace into memory
-			printf("VCB ALREADY INITALIZED;\nSignature: %d\n", vcb->signature);
+			printf("Welcome back!\n");
 		}
+		return 0;
 	}
 
-	return 0;
-}
+	return -1; // Unable to read from disk
+}	
 
 void exitFileSystem()
 {
 	printf("System exiting\n");
+	free(vcb);
+	vcb = NULL;
 }

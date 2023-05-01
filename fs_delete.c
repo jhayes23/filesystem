@@ -25,12 +25,11 @@
 
 int fs_delete(char *filename)
 {
-    int bytesNeed = initDirAmt * sizeof(directoryEntry);
-    int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
-    int byteUsed = blkCount * vcb->blockSize;
     parsedPath parsed = parsePath(filename);
+    int blkCount = //Calculate filesize in blocks
+        (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1)/vcb->blockSize;
 
-    if (parsed.index > 0)
+    if (parsed.index > 0 && parsed.parent[parsed.index].isFile == FILEMACRO)
     {
         // If path is reachable-> mark entry as avail on disk
         parsed.parent[parsed.index].location = 0;
@@ -39,8 +38,14 @@ int fs_delete(char *filename)
 
         LBAwrite(parsed.parent, blkCount, parsed.parent[0].location);
         // TODO set freespace blocks to available
+
+        // free memory allocations
+        free(parsed.parent);
+        free(parsed.path);
+        parsed.parent = NULL;
+        parsed.path = NULL;
+        return 0;
     }
-    // free memory allocations
-    free(parsed.parent);
-    parsed.parent = NULL;
+
+    return -1; //Unsuccessful file delete
 }

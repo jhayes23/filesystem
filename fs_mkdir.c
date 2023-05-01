@@ -24,20 +24,26 @@
 
 int fs_mkdir(const char *pathname, mode_t mode)
 {
-    parsedPath parsed = parsePath(pathname);
-    if (parsed.parent != NULL && parsed.index == -1)
+    parsedPath parsed = parsePath(pathname); //get parent directory and index of child
+    if (parsed.parent != NULL && parsed.index == -1) 
+    //if a path was valid and child does not exist 
     {
+           
         // Searches parent directory for available slot
         int entryIndex = findOpenEntrySlot(parsed.parent);
-
-        if (entryIndex > 0)
+        if (entryIndex > 0) //empty index to create directory was found
         {
             // Create directory
             directoryEntry *createDir = initDir(initDirAmt, parsed.parent);
             // copy directory info into parent
+             //set filename
             strcpy(parsed.parent[entryIndex].fileName, parsed.dirName);
-            parsed.parent[entryIndex].location = createDir->location;
+            //set start location in parent directory
+            parsed.parent[entryIndex].location = createDir->location; 
+            //update metadata such as lastModified date
             parsed.parent[entryIndex].lastModifyDate = createDir->lastModifyDate;
+            //mark entry as a directory
+            parsed.parent[entryIndex].isFile = DIRECTORY;
 
             // writes back to disk
             int bytesNeed = initDirAmt * sizeof(directoryEntry);
@@ -46,11 +52,14 @@ int fs_mkdir(const char *pathname, mode_t mode)
 
             // free memory allocations
             free(parsed.parent);
+            free(parsed.path);
             parsed.parent = NULL;
+            parsed.path = NULL;
             return 0;
         }
+
     }
-    // Unable to reach directory or
-    printf("Unable to create directory %s\n", pathname);
+    // Unable to reach directory 
+    printf("Failed to make directory.\n");
     return -1;
 }

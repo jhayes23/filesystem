@@ -35,5 +35,4 @@ typedef struct directoryEntry
 extern directoryEntry* initDir(int minNumEntries, directoryEntry*parent);
 #endif
 
-extern directoryEntry * rootDir;
 extern char currentWorkDir[256];
