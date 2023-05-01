@@ -6,7 +6,7 @@
  * Group Name: Team DALJ
  * Project: Basic File System
  *
- * File: mkdir.c
+ * File: fs_mkdir.c
  *
  * Description: Creates a directory at specified path
  *
@@ -24,25 +24,26 @@
 
 int fs_mkdir(const char *pathname, mode_t mode)
 {
-    parsedPath parsed = parsePath(pathname); //get parent directory and index of child
-    if (parsed.parent != NULL && parsed.index == -1) 
-    //if a path was valid and child does not exist 
+    parsedPath parsed = parsePath(pathname); // get parent directory and index of child
+    if (parsed.parent != NULL && parsed.index == -1)
+    // if a path was valid and child does not exist
     {
-           
+
         // Searches parent directory for available slot
         int entryIndex = findOpenEntrySlot(parsed.parent);
-        if (entryIndex > 0) //empty index to create directory was found
+        printf("entryIndex: %d\n", entryIndex);
+        if (entryIndex > 0) // empty index to create directory was found
         {
             // Create directory
             directoryEntry *createDir = initDir(initDirAmt, parsed.parent);
             // copy directory info into parent
-             //set filename
+            // set filename
             strcpy(parsed.parent[entryIndex].fileName, parsed.dirName);
-            //set start location in parent directory
-            parsed.parent[entryIndex].location = createDir->location; 
-            //update metadata such as lastModified date
+            // set start location in parent directory
+            parsed.parent[entryIndex].location = createDir->location;
+            // update metadata such as lastModified date
             parsed.parent[entryIndex].lastModifyDate = createDir->lastModifyDate;
-            //mark entry as a directory
+            // mark entry as a directory
             parsed.parent[entryIndex].isFile = DIRECTORY;
 
             // writes back to disk
@@ -57,9 +58,8 @@ int fs_mkdir(const char *pathname, mode_t mode)
             parsed.path = NULL;
             return 0;
         }
-
     }
-    // Unable to reach directory 
+    // Unable to reach directory
     printf("Failed to make directory.\n");
     return -1;
 }

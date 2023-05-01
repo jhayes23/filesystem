@@ -6,7 +6,7 @@
  * Group Name: Team DALJ
  * Project: Basic File System
  *
- * File: fs_setcwd.c
+ * File: fs_getcwd.c
  *
  * Description: Returns current working directory of specified path
  *

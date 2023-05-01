@@ -8,7 +8,7 @@
  *
  * File: fs_opendir.c
  *
- * Description: 
+ * Description: Opens a directory and allows it to be accessible in memory by the rest of the system.
  *
  *
  *

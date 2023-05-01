@@ -1,14 +1,16 @@
 /**************************************************************
- * Class:  CSC-415-0# Fall 2021
- * Names:
- * Student IDs:
- * GitHub Name:
- * Group Name:
+ * Class:  CSC-415-01 Spring 2023
+ * Names: Anthony Benjamin, Nyan Ye Lin, Joshua Hayes, David Chen
+ * Student IDs: 921119898, 921572181, 922379312, 922894099
+ * GitHub Name: copbrick
+ * Group Name: Team DALJ
  * Project: Basic File System
  *
  * File: b_io.c
  *
- * Description: Basic File System - Key File I/O Operations
+ * Description: Buffering I/O handling for the user
+ *
+ *
  *
  **************************************************************/
 

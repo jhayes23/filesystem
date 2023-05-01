@@ -8,7 +8,8 @@
  *
  * File: fs_closedir.c
  *
- * Description: 
+ * Description: Adds functionality to close a directory and all of it's associated resources. 
+ * This will free up a file descriptor in our file control block array. 
  *
  *
  *

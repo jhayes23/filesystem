@@ -6,7 +6,7 @@
  * Group Name: Team DALJ
  * Project: Basic File System
  *
- * File: fs_isDir
+ * File: fs_isDir.c
  *
  * Description: Checks if directory entry at a path is a directory
  *
