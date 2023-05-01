@@ -27,9 +27,9 @@ int fs_isDir(char *filename)
 
         if (dir->isFile == DIRECTORY)
         {
-            return 1;
+            return DIRECTORY;
         }
     }
 
-    return 0;
+    return FILEMACRO;
 }

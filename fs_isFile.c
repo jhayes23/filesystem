@@ -26,9 +26,9 @@ int fs_isFile(char *filename)
         directoryEntry *dir = path.parent;
         if (dir->isFile == FILEMACRO)
         {
-            return 1;
+            return FILEMACRO;
         }
     }
 
-    return 0;
+    return DIRECTORY;
 }

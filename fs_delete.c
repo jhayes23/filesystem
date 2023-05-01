@@ -26,10 +26,10 @@
 int fs_delete(char *filename)
 {
     parsedPath parsed = parsePath(filename);
-    int blkCount = //Calculate filesize in blocks
-        (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1)/vcb->blockSize;
+    int blkCount = // Calculate filesize in blocks
+        (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1) / vcb->blockSize;
 
-    if (parsed.index > 0 && parsed.parent[parsed.index].isFile == FILEMACRO)
+    if (parsed.index > 0 && fs_isFile(parsed.parent[parsed.index].fileName) == FILEMACRO)
     {
         // If path is reachable-> mark entry as avail on disk
         parsed.parent[parsed.index].location = 0;
@@ -47,5 +47,5 @@ int fs_delete(char *filename)
         return 0;
     }
 
-    return -1; //Unsuccessful file delete
+    return -1; // Unsuccessful file delete
 }

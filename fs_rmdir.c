@@ -25,13 +25,13 @@
 
 int fs_rmdir(const char *pathname)
 {
-    //Calculate size needed to malloc for directory
+    // Calculate size needed to malloc for directory
     int bytesNeed = initDirAmt * sizeof(directoryEntry);
     int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
     int byteUsed = blkCount * vcb->blockSize;
 
-    parsedPath parsed = parsePath(pathname);  //get parent directory and index of child
-    if (parsed.index > 0 && parsed.parent[parsed.index].isFile == DIRECTORY)
+    parsedPath parsed = parsePath(pathname); // get parent directory and index of child
+    if (parsed.index > 0 && fs_isDir(parsed.parent[parsed.index].fileName) == DIRECTORY)
     { // If path is reachable
         // load dir into memory
         directoryEntry *checkDir = malloc(byteUsed);
@@ -39,31 +39,31 @@ int fs_rmdir(const char *pathname)
 
         // checks the directory for any files/directories before attempting to delete
         int directoryEmpty = directoryIsEmpty(checkDir);
-        if (directoryEmpty == 0)//directory was found to be empty-> delete the directory
+        if (directoryEmpty == 0) // directory was found to be empty-> delete the directory
         {
-            parsed.parent[parsed.index].location = 0;//make location as free
-            parsed.parent[parsed.index].fileSize = 0;//set file size to 0;
-            strcpy(parsed.parent[parsed.index].fileName, "\0");// clear name
+            parsed.parent[parsed.index].location = 0;           // make location as free
+            parsed.parent[parsed.index].fileSize = 0;           // set file size to 0;
+            strcpy(parsed.parent[parsed.index].fileName, "\0"); // clear name
 
             LBAwrite(parsed.parent, blkCount, parsed.parent[0].location);
-            
-            unsigned char *freeSpaceManager = 
+
+            unsigned char *freeSpaceManager =
                 malloc(vcb->sizeOfFreeSpaceManager * vcb->blockSize * sizeof(char));
             freeBlocks(freeSpaceManager,
-                vcb->freeSpaceManagerBlock,vcb->sizeOfFreeSpaceManager);
-                free(freeSpaceManager);
-                freeSpaceManager = NULL;
+                       vcb->freeSpaceManagerBlock, vcb->sizeOfFreeSpaceManager);
+            free(freeSpaceManager);
+            freeSpaceManager = NULL;
         }
         // free memory allocations
         free(checkDir);
         free(parsed.parent);
         free(parsed.path);
-  
+
         parsed.parent = NULL;
         parsed.path = NULL;
         checkDir = NULL;
         return 0;
     }
 
-    return -1; //Unsuccessful removal of directory
+    return -1; // Unsuccessful removal of directory
 }

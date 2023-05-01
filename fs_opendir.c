@@ -29,7 +29,7 @@ fdDir *fs_opendir(const char *pathname)
         printf("open error: can't found such directory\n");
         return NULL;
     }
-    if (parsed.parent[parsed.index].isFile != DIRECTORY)
+    if (fs_isDir(parsed.parent[parsed.index].fileName) != DIRECTORY)
     {
         printf("open error: this is not a directory\n");
         fs_closedir(dir);
