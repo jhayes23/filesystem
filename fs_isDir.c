@@ -21,11 +21,15 @@ int fs_isDir(char *filename)
 {
 
     parsedPath path = parsePath(filename);
-    directoryEntry *dir = path.parent;
-
-    if (dir->isFile == DIRECTORY)
+    if (path.index > 0)
     {
-        return 1;
+        directoryEntry *dir = path.parent;
+
+        if (dir->isFile == DIRECTORY)
+        {
+            return 1;
+        }
     }
+
     return 0;
 }
