@@ -28,6 +28,7 @@
 #include "directoryEntry.h"
 #define MAXFCBS 20
 #define B_CHUNK_SIZE 512
+#define FILE_BLOCKS 50
 
 typedef struct b_fcb
 {
@@ -39,6 +40,8 @@ typedef struct b_fcb
 	int numBlocks;	// holds how many blocks file occupies
 	int fileOffset; // holds the current position that the file is at
 	int flags;
+	directoryEntry * parent; // for write back
+	int dirindex;
 	directoryEntry * DE;
 } b_fcb;
 
@@ -92,7 +95,6 @@ b_io_fd b_open(char *filename, int flags)
 	}
 	parsedPath parsed = parsePath(filename);
 	int pos=0;
-	fcbArray[returnFd].DE = malloc(sizeof(directoryEntry));
 	//if file exists
 	if(parsed.index==-1){
 		if(flags & O_CREAT){
@@ -102,6 +104,7 @@ b_io_fd b_open(char *filename, int flags)
 			parsed.parent[start].createDate=t;
 			parsed.parent[start].lastAccessDate=t;
 			parsed.parent[start].lastModifyDate=t;
+			parsed.parent[start].location = findFreeBlocks(FILE_BLOCKS);
 			parsed.parent[start].fileSize = 0;
 			parsed.parent[start].isFile = FILEMACRO;
 			memcpy(fcbArray[returnFd].DE, &parsed.parent[start],sizeof(directoryEntry));
@@ -116,12 +119,15 @@ b_io_fd b_open(char *filename, int flags)
 		}
 		memcpy(fcbArray[returnFd].DE, &parsed.parent[parsed.index],sizeof(directoryEntry));
 	}
+	fcbArray[returnFd].parent = malloc(parsed.parent->fileSize);
+	memcpy(fcbArray[returnFd].parent, &parsed.parent,parsed.parent->fileSize);
+	fcbArray[returnFd].dirindex = parsed.index;
 	fcbArray[returnFd].flags = flags;
-	fcbArray[returnFd].buf = malloc(vcb->blockSize);
-	fcbArray[returnFd].buflen = vcb->blockSize;
+	fcbArray[returnFd].buf = malloc(B_CHUNK_SIZE);
+	fcbArray[returnFd].buflen = B_CHUNK_SIZE;
 	fcbArray[returnFd].index = 0;
 	fcbArray[returnFd].currentBlk = 0;
-	fcbArray[returnFd].numBlocks = (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1) / vcb->blockSize;
+	fcbArray[returnFd].numBlocks = (parsed.parent[parsed.index].fileSize + B_CHUNK_SIZE - 1) / B_CHUNK_SIZE;
 	fcbArray[returnFd].fileOffset = pos;
 	return (returnFd); // all set
 }
@@ -159,6 +165,8 @@ int b_seek(b_io_fd fd, off_t offset, int whence)
 // Interface to write function
 int b_write(b_io_fd fd, char *buffer, int count)
 {
+	int part1, part2, part3;
+	int leftover, blocks;
 	if (startup == 0)
 		b_init(); // Initialize our system
 
@@ -171,11 +179,49 @@ int b_write(b_io_fd fd, char *buffer, int count)
 		printf("This file cannot write\n");
 		return -1;
 	}
-	fcbArray[fd].currentBlk = fcbArray[fd].fileOffset/vcb->blockSize;
-	int blockindex = fcbArray[fd].fileOffset%vcb->blockSize;
-	
+	fcbArray[fd].currentBlk = fcbArray[fd].DE->fileSize/B_CHUNK_SIZE;
+	fcbArray[fd].index = fcbArray[fd].DE->fileSize%B_CHUNK_SIZE;
+	int maxbytes = FILE_BLOCKS*B_CHUNK_SIZE;
+	if(count+fcbArray[fd].DE->fileSize >maxbytes){
+		count = maxbytes - fcbArray[fd].DE->fileSize;
+		printf("the file is not big enough\n");
+	}
+	int remain = fcbArray[fd].buflen - fcbArray[fd].index;
+	if(count>remain){
+		part1 = remain;
+		leftover = count - part1;
+		blocks = leftover/B_CHUNK_SIZE;
+		part2 = blocks*B_CHUNK_SIZE;
+		part3 = leftover - part2;
+	}else{
+		part1 = count;
+		fcbArray[fd].index+=part1;
+		part2 = 0;
+		part3 = 0;
+	}
+	memcpy(fcbArray[fd].buf+fcbArray[fd].index,buffer,part1);
+	if(part1>remain){
+		LBAwrite(buffer,1,fcbArray[fd].DE->location+fcbArray[fd].currentBlk);
+		fcbArray[fd].currentBlk++;
+		fcbArray[fd].buf = NULL;
+		fcbArray[fd].index=0;
+	}
+	// if part2>0 it's larger than a blocksize
+	if(part2>0){
+		
+		LBAwrite(buffer+part1,blocks,fcbArray[fd].DE->location+fcbArray[fd].currentBlk);
+		fcbArray[fd].currentBlk+=blocks;
+		
+	}
+	if(part3>0){
+		memcpy(fcbArray[fd].buf+fcbArray[fd].index,buffer+part1+part2,part3);
+	}
+	int bytesWrite = part1+part2+part3;
+	fcbArray[fd].DE->fileSize+=bytesWrite;
+	fcbArray[fd].DE->lastAccessDate = time(NULL);
+	fcbArray[fd].DE->lastModifyDate = time(NULL);
 
-	return (0); // Change this
+	return count; // Change this
 }
 
 // Interface to read a buffer
@@ -224,8 +270,8 @@ int b_read(b_io_fd fd, char *buffer, int count)
 	if(count>remain){
 		part1 = remain;
 		leftover = count - part1;
-		blocks = leftover/vcb->blockSize;
-		part2 = blocks*vcb->blockSize;
+		blocks = leftover/B_CHUNK_SIZE;
+		part2 = blocks*B_CHUNK_SIZE;
 		part3 = leftover - part2;
 	}else{
 		part1 = count;
@@ -246,8 +292,10 @@ int b_read(b_io_fd fd, char *buffer, int count)
 		
 	}
 	if(part3>0){
-		LBAread(fcbArray[fd].buf,1,fcbArray[fd].DE->location+fcbArray[fd].currentBlk);
+		//reset index and buffer
+		fcbArray[fd].buf = NULL;
 		fcbArray[fd].index=0;
+		LBAread(fcbArray[fd].buf,1,fcbArray[fd].DE->location+fcbArray[fd].currentBlk);
 		memcpy(buffer+part1+part2,fcbArray[fd].buf+fcbArray[fd].index,part3);
 	}
 	int bytesRead = part1+part2+part3;
@@ -259,4 +307,25 @@ int b_read(b_io_fd fd, char *buffer, int count)
 // Interface to Close the file
 int b_close(b_io_fd fd)
 {
+	if(fcbArray[fd].DE==NULL){
+		printf("the file have not open yet\n");
+		return -1;
+	}
+	if((fcbArray[fd].flags&O_RDONLY)||(fcbArray[fd].flags&O_RDWR)){
+		LBAwrite(fcbArray[fd].buf,1,fcbArray[fd].DE->location+fcbArray[fd].currentBlk);
+	}
+	memcpy(&fcbArray[fd].parent[fcbArray[fd].dirindex],fcbArray[fd].DE,sizeof(directoryEntry));
+	LBAwrite(fcbArray[fd].parent,(fcbArray[fd].parent->fileSize/vcb->blockSize)+1,fcbArray[fd].parent->location);
+	free(fcbArray[fd].parent);
+	fcbArray[fd].parent = NULL;
+	fcbArray[fd].dirindex = 0;
+	fcbArray[fd].DE = NULL;
+	fcbArray[fd].buflen = 0;
+    fcbArray[fd].flags = 0;
+    fcbArray[fd].numBlocks = 0;
+	fcbArray[fd].currentBlk = 0;
+	fcbArray[fd].fileOffset = 0;
+	fcbArray[fd].index = 0;
+    free(fcbArray[fd].buf);
+    fcbArray[fd].buf = NULL;
 }
