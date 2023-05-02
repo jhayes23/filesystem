@@ -30,14 +30,18 @@ int fs_stat(const char * path, struct fs_stat *buf)
 {
     parsedPath parsed = parsePath(path);
     
+    // getting the index from parsedpath
     int index = parsed.index;
 
     printf("Index From Parsed Path: %d\n", index);
-
+    // malloc memory to buf to fill in infomation
     buf = malloc(sizeof(fs_stat) * 100);
 
+    // checking if the index is valid
     if (index > -1)
     {
+        // setting th values to fs_stat struct
+        // and prints out the informations 
         buf->st_size = parsed.parent[index].fileSize;
         printf("Size : %ld\n", buf->st_size);
         
@@ -59,7 +63,6 @@ int fs_stat(const char * path, struct fs_stat *buf)
         return 0;
         
     }
-
-
+    // if index is not valid
     return -1;
 }
