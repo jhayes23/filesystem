@@ -34,6 +34,7 @@ int initRootDir(int blockSize)
 	directoryEntry *dir = (directoryEntry *)malloc(initDirAmt);
 	dir = initDir(initDirAmt, NULL);
 	int rootposition = dir[0].location;
+	vcb->rootDirSize = dir->fileSize;
 
 	free(dir);
 	dir = NULL;

@@ -22,10 +22,10 @@
 #include "vcb.h"
 #include "parsePath.h"
 
-void loadDirectory(directoryEntry *loadDir, int dirStartBlock) // Loads Directory into memory
+void loadDirectory(directoryEntry *loadDir, int entryIndex) // Loads Directory into memory
 {
-    int bytesNeed = initDirAmt * sizeof(directoryEntry);
-    int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
+    int dirStartBlock = loadDir[entryIndex].location;
+    int blkCount = (loadDir[entryIndex].fileSize + vcb->blockSize - 1) / vcb->blockSize;
     LBAread(loadDir, blkCount, dirStartBlock);
 }
 
@@ -49,15 +49,14 @@ parsedPath parsePath(const char *path) // Parses a path and returns a struct con
 {
     char pathname[256]; // Pointer to tokenize
     // Calculate bytes needed for dir malloc
-    int bytesNeed = initDirAmt * sizeof(directoryEntry);
-    int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
+    int blkCount = (vcb->rootDirSize+ vcb->blockSize - 1) / vcb->blockSize;
     int byteUsed = blkCount * vcb->blockSize;
 
     directoryEntry *dirToParse = malloc(byteUsed); // to read and access directories
     parsedPath pathRet; // return struct
     pathRet.path = resolvePath(path); // else, resolve path to return
     strcpy(pathname, pathRet.path);  // copy path for tokenizing
-
+    
     if (path == NULL)
     {
         // There is nothing to tokenize
@@ -102,7 +101,7 @@ parsedPath parsePath(const char *path) // Parses a path and returns a struct con
             return pathRet;
         }
         // loads directory at found index
-        loadDirectory(dirToParse, dirToParse[entryIndex].location);
+        loadDirectory(dirToParse, entryIndex);
     }
     pathRet.index = locateEntry(dirToParse, token); // returns the index of the child directory
     pathRet.parent = dirToParse;
@@ -180,7 +179,7 @@ char *resolvePath(const char *path)
         if (strcmp(token, "..") == 0)
         { // If current token == "..", undo the previous token add and decrement i
             // Go back
-            if (i >= 0)
+            if (i > 0)
             {
                 i--;
                 tempArr[i] = NULL;

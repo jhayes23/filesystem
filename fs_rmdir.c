@@ -25,13 +25,12 @@
 
 int fs_rmdir(const char *pathname)
 {
+     parsedPath parsed = parsePath(pathname); // get parent directory and index of child
     // Calculate size needed to malloc for directory
-    int bytesNeed = initDirAmt * sizeof(directoryEntry);
-    int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
+    int blkCount = (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1) / vcb->blockSize;
     int byteUsed = blkCount * vcb->blockSize;
 
-    parsedPath parsed = parsePath(pathname); // get parent directory and index of child
-    if (parsed.index > 0 && fs_isDir(parsed.parent[parsed.index].fileName) == DIRECTORY)
+    if (parsed.index >= 2 && fs_isDir(parsed.parent[parsed.index].fileName) == DIRECTORY)
     { // If path is reachable
         // load dir into memory
         directoryEntry *checkDir = malloc(byteUsed);

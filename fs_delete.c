@@ -29,7 +29,7 @@ int fs_delete(char *filename)
     int blkCount = // Calculate filesize in blocks
         (parsed.parent[parsed.index].fileSize + vcb->blockSize - 1) / vcb->blockSize;
 
-    if (parsed.index > 0 && fs_isFile(parsed.parent[parsed.index].fileName) == FILEMACRO)
+    if (parsed.index >= 2 && fs_isFile(parsed.parent[parsed.index].fileName) == FILEMACRO)
     {
         // If path is reachable-> mark entry as avail on disk
         parsed.parent[parsed.index].location = 0;
@@ -37,7 +37,12 @@ int fs_delete(char *filename)
         strcpy(parsed.parent[parsed.index].fileName, "\0");
 
         LBAwrite(parsed.parent, blkCount, parsed.parent[0].location);
-        // TODO set freespace blocks to available
+        unsigned char *freeSpaceManager =
+            malloc(vcb->sizeOfFreeSpaceManager * vcb->blockSize * sizeof(char));
+        freeBlocks(freeSpaceManager,
+                   vcb->freeSpaceManagerBlock, vcb->sizeOfFreeSpaceManager);
+        free(freeSpaceManager);
+        freeSpaceManager = NULL;
 
         // free memory allocations
         free(parsed.parent);

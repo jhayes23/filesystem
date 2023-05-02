@@ -32,13 +32,15 @@ int fs_mkdir(const char *pathname, mode_t mode)
         // Searches parent directory for available slot
         int entryIndex = findOpenEntrySlot(parsed.parent);
         printf("entryIndex: %d\n", entryIndex);
-        if (entryIndex > 0) // empty index to create directory was found
+        if (entryIndex >= 2) // empty index to create directory was found
         {
             // Create directory
             directoryEntry *createDir = initDir(initDirAmt, parsed.parent);
             // copy directory info into parent
             // set filename
             strcpy(parsed.parent[entryIndex].fileName, parsed.dirName);
+            //set filesize of child directory
+            parsed.parent[entryIndex].fileSize = createDir->fileSize;
             // set start location in parent directory
             parsed.parent[entryIndex].location = createDir->location;
             // update metadata such as lastModified date
@@ -47,8 +49,8 @@ int fs_mkdir(const char *pathname, mode_t mode)
             parsed.parent[entryIndex].isFile = DIRECTORY;
 
             // writes back to disk
-            int bytesNeed = initDirAmt * sizeof(directoryEntry);
-            int blkCount = (bytesNeed + vcb->blockSize - 1) / vcb->blockSize;
+            int blkCount = 
+                (parsed.parent[entryIndex].fileSize + vcb->blockSize - 1) / vcb->blockSize;
             LBAwrite(parsed.parent, blkCount, parsed.parent->location);
 
             // free memory allocations

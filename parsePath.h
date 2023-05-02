@@ -16,16 +16,16 @@
 #include "directoryEntry.h"
 typedef struct
 {
-    int index;
-    char dirName[64];
-    char childName[64];
-    char  * path;
-    directoryEntry * parent; 
+    int index; //index at which child exists
+    char dirName[64];  //directory name
+    char childName[64];//name of child
+    char  * path; //absolute path
+    directoryEntry * parent;  //pointer to location of directory
 }parsedPath;
 
-void loadDirectory(directoryEntry * loadDir,int dirStartBlock);
-int locateEntry( directoryEntry * dir, char * entry);
-parsedPath parsePath(const char * path);
-int findOpenEntrySlot(directoryEntry * parent);
-int directoryIsEmpty(directoryEntry * parent);
-char * resolvePath(const char *path);
+void loadDirectory(directoryEntry * loadDir, int entryIndex);//loads directory into given buffer
+int locateEntry( directoryEntry * dir, char * entry);//searches directory for an entry
+parsedPath parsePath(const char * path); //parses a path and returns parsePath object
+int findOpenEntrySlot(directoryEntry * parent);//searches directory for an avail slot
+int directoryIsEmpty(directoryEntry * parent);//checks whether directory is empty or not
+char * resolvePath(const char *path);//creates an absolute path
